@@ -119,6 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     permissions:
+      actions: read # Needed for upload-sarif to get workflow run info.
       contents: read
       security-events: write
     
