@@ -3,6 +3,16 @@ plugins {
   id("com.google.cloud.tools.jib")
 }
 
+tasks.jar {
+  manifest {
+    attributes(
+      "Main-Class" to "dev.cafe.bot.Main"
+    )
+  }
+  from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
   implementation(project(":bot-core"))
   implementation(project(":audio-lavaplayer"))
