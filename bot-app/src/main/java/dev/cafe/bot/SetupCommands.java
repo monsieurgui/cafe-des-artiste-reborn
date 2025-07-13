@@ -156,15 +156,35 @@ public class SetupCommands extends ListenerAdapter {
           return;
         }
 
-        guildSettingsRepository.save(new GuildSettings(guildId, channelId, 0, 0));
-        event
-            .getChannel()
-            .sendMessage(
-                "Great! I've linked to "
-                    + channel.getAsMention()
-                    + ". I will post the queue and now-playing messages there.")
-            .queue();
-        pendingSetups.remove(userId);
+        channel
+            .sendMessage("🎶 **Queue** (auto-updated)")
+            .queue(
+                queueMsg -> {
+                  channel
+                      .sendMessage("▶️ **Now playing…**")
+                      .queue(
+                          nowPlayingMsg -> {
+                            queueMsg.pin().queue();
+                            nowPlayingMsg.pin().queue();
+
+                            GuildSettings settings =
+                                new GuildSettings(
+                                    guildId,
+                                    channelId,
+                                    queueMsg.getIdLong(),
+                                    nowPlayingMsg.getIdLong());
+                            guildSettingsRepository.save(settings);
+
+                            event
+                                .getChannel()
+                                .sendMessage(
+                                    "Great! I've linked to "
+                                        + channel.getAsMention()
+                                        + ". I've created and pinned the queue and now-playing messages there.")
+                                .queue();
+                            pendingSetups.remove(userId);
+                          });
+                });
 
       } else {
         event

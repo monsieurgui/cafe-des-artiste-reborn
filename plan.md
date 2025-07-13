@@ -8,7 +8,6 @@
 
 | # | Task (Conventional-Commit style) | Acceptance criteria |
 |---|----------------------------------|---------------------|
-| 3 | **feat(dm): implement whisper flow** | Bot DMs the invoking admin:<br>  a. asks “Link a text channel for queue/now-playing?”<br>  b. waits for channel mention reply (timeout 2 min).<br>  c. validates bot has `SEND_MESSAGES` & `MANAGE_MESSAGES` in that channel.<br>  d. stores `channelId` in `guild_settings`. |
 | 4 | **feat(posts): create two pinned messages in linked channel** | a. Top message content: “🎶 **Queue** (auto-updated)”<br>b. Second message: “▶️ **Now playing…**” placeholder.<br>Both IDs stored in DB; messages pinned. |
 | 5 | **feat(queue-display): update queue message on TrackQueue changes** | Edits top post embed whenever queue mutates; integration test uses mock JDA. |
 | 6 | **feat(now-playing): update now-playing message every 15 s** | Shows title, requester, elapsed/total time progress bar (ASCII ░/█). Stops updates when paused or track ends. |
@@ -25,3 +24,4 @@
 |---|--------|-------------|
 | 1 | d46c18d | **chore(data): add GuildSettings table (SQLite)** |
 | 2 | 7748859 | **feat(setup): introduce `/setup` slash command (guild-only)** |
+| 3 | 2dc6d68 | **feat(dm): implement whisper flow** |
