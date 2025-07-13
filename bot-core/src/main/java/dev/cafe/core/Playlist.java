@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represents a user playlist with tracks and metadata.
- */
+/** Represents a user playlist with tracks and metadata. */
 public class Playlist {
   private final String id;
   private final String name;

@@ -15,9 +15,7 @@ import dev.cafe.core.VoiceManager;
 import dev.cafe.metrics.MetricsBinder;
 import javax.inject.Singleton;
 
-/**
- * Dagger module for dependency injection.
- */
+/** Dagger module for dependency injection. */
 @Module
 public class BotModule {
 
@@ -32,8 +30,8 @@ public class BotModule {
   AudioSearchService provideAudioSearchService(ConfigLoader config) {
     String backend = config.getAudioBackend();
     if ("lavalink".equals(backend)) {
-      return new LavalinkSearchService(config.getLavalinkHost(), 
-          config.getLavalinkPort(), config.getLavalinkPassword());
+      return new LavalinkSearchService(
+          config.getLavalinkHost(), config.getLavalinkPort(), config.getLavalinkPassword());
     } else {
       return new LavaplayerSearchService();
     }
@@ -44,8 +42,8 @@ public class BotModule {
   PlaybackStrategy providePlaybackStrategy(ConfigLoader config, AudioSearchService searchService) {
     String backend = config.getAudioBackend();
     if ("lavalink".equals(backend)) {
-      return new LavalinkPlaybackStrategy(config.getLavalinkHost(), 
-          config.getLavalinkPort(), config.getLavalinkPassword());
+      return new LavalinkPlaybackStrategy(
+          config.getLavalinkHost(), config.getLavalinkPort(), config.getLavalinkPassword());
     } else {
       return new LavaplayerPlaybackStrategy((LavaplayerSearchService) searchService);
     }
@@ -71,16 +69,15 @@ public class BotModule {
 
   @Provides
   @Singleton
-  AudioController provideAudioController(AudioSearchService searchService, 
-                                         PlaybackStrategy playbackStrategy,
-                                         MetricsBinder metrics) {
+  AudioController provideAudioController(
+      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
     AudioController controller = new AudioController(searchService, playbackStrategy, metrics);
-    
+
     // Set up circular dependency
     if (playbackStrategy instanceof LavaplayerPlaybackStrategy) {
       ((LavaplayerPlaybackStrategy) playbackStrategy).setAudioController(controller);
     }
-    
+
     return controller;
   }
 }

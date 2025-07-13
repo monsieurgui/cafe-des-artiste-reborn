@@ -8,9 +8,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-/**
- * Thread-safe queue for managing audio tracks.
- */
+/** Thread-safe queue for managing audio tracks. */
 public class TrackQueue {
   private final BlockingDeque<AudioTrack> queue = new LinkedBlockingDeque<>();
   private final AtomicBoolean looping = new AtomicBoolean(false);
@@ -28,7 +26,7 @@ public class TrackQueue {
     if (looping.get() && currentTrack != null) {
       return Optional.of(currentTrack);
     }
-    
+
     AudioTrack next = queue.poll();
     currentTrack = next;
     return Optional.ofNullable(next);

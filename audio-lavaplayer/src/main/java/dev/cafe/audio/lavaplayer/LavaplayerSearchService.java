@@ -13,9 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * Lavaplayer implementation of AudioSearchService.
- */
+/** Lavaplayer implementation of AudioSearchService. */
 @Singleton
 public class LavaplayerSearchService implements AudioSearchService {
   private final AudioPlayerManager playerManager;
@@ -40,33 +38,35 @@ public class LavaplayerSearchService implements AudioSearchService {
 
   private CompletableFuture<SearchResult> loadItem(String identifier) {
     CompletableFuture<SearchResult> future = new CompletableFuture<>();
-    
-    playerManager.loadItem(identifier, new AudioLoadResultHandler() {
-      @Override
-      public void trackLoaded(AudioTrack track) {
-        future.complete(LavaplayerSearchResult.trackLoaded(track));
-      }
 
-      @Override
-      public void playlistLoaded(AudioPlaylist playlist) {
-        if (playlist.isSearchResult()) {
-          future.complete(LavaplayerSearchResult.searchResult(playlist.getTracks()));
-        } else {
-          future.complete(LavaplayerSearchResult.playlistLoaded(playlist));
-        }
-      }
+    playerManager.loadItem(
+        identifier,
+        new AudioLoadResultHandler() {
+          @Override
+          public void trackLoaded(AudioTrack track) {
+            future.complete(LavaplayerSearchResult.trackLoaded(track));
+          }
 
-      @Override
-      public void noMatches() {
-        future.complete(LavaplayerSearchResult.noMatches());
-      }
+          @Override
+          public void playlistLoaded(AudioPlaylist playlist) {
+            if (playlist.isSearchResult()) {
+              future.complete(LavaplayerSearchResult.searchResult(playlist.getTracks()));
+            } else {
+              future.complete(LavaplayerSearchResult.playlistLoaded(playlist));
+            }
+          }
 
-      @Override
-      public void loadFailed(FriendlyException exception) {
-        future.complete(LavaplayerSearchResult.loadFailed(exception));
-      }
-    });
-    
+          @Override
+          public void noMatches() {
+            future.complete(LavaplayerSearchResult.noMatches());
+          }
+
+          @Override
+          public void loadFailed(FriendlyException exception) {
+            future.complete(LavaplayerSearchResult.loadFailed(exception));
+          }
+        });
+
     return future;
   }
 

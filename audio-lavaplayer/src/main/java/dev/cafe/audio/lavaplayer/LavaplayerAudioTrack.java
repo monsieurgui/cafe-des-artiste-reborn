@@ -1,12 +1,9 @@
 package dev.cafe.audio.lavaplayer;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.cafe.audio.AudioTrack;
 import java.time.Duration;
 
-/**
- * Lavaplayer implementation of AudioTrack.
- */
+/** Lavaplayer implementation of AudioTrack. */
 public class LavaplayerAudioTrack implements AudioTrack {
   private final com.sedmelluq.discord.lavaplayer.track.AudioTrack lavaTrack;
 

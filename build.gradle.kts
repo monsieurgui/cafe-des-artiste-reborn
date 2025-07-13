@@ -12,12 +12,14 @@ allprojects {
   repositories {
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://maven.lavalink.dev/releases")
   }
 }
 
 subprojects {
   apply(plugin = "java")
   apply(plugin = "java-library")
+  apply(plugin = "jacoco")
   apply(plugin = "com.diffplug.spotless")
 
   java {
@@ -34,10 +36,10 @@ subprojects {
 
   tasks.test {
     useJUnitPlatform()
-    finalizedBy(tasks.jacocoTestReport)
+    finalizedBy(tasks.named("jacocoTestReport"))
   }
 
-  tasks.jacocoTestReport {
+  tasks.named<JacocoReport>("jacocoTestReport") {
     dependsOn(tasks.test)
   }
 

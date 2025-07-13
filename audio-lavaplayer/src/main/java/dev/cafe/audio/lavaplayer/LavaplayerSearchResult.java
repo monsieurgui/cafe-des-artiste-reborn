@@ -7,9 +7,7 @@ import dev.cafe.audio.SearchResult;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Lavaplayer implementation of SearchResult.
- */
+/** Lavaplayer implementation of SearchResult. */
 public class LavaplayerSearchResult implements SearchResult {
   private final Type type;
   private final LavaplayerAudioTrack track;
@@ -17,9 +15,12 @@ public class LavaplayerSearchResult implements SearchResult {
   private final String playlistName;
   private final String errorMessage;
 
-  private LavaplayerSearchResult(Type type, LavaplayerAudioTrack track, 
-                                 List<dev.cafe.audio.AudioTrack> tracks, 
-                                 String playlistName, String errorMessage) {
+  private LavaplayerSearchResult(
+      Type type,
+      LavaplayerAudioTrack track,
+      List<dev.cafe.audio.AudioTrack> tracks,
+      String playlistName,
+      String errorMessage) {
     this.type = type;
     this.track = track;
     this.tracks = tracks;
@@ -28,26 +29,22 @@ public class LavaplayerSearchResult implements SearchResult {
   }
 
   public static LavaplayerSearchResult trackLoaded(AudioTrack track) {
-    return new LavaplayerSearchResult(Type.TRACK_LOADED, 
-        new LavaplayerAudioTrack(track), null, null, null);
+    return new LavaplayerSearchResult(
+        Type.TRACK_LOADED, new LavaplayerAudioTrack(track), null, null, null);
   }
 
   public static LavaplayerSearchResult playlistLoaded(AudioPlaylist playlist) {
-    List<dev.cafe.audio.AudioTrack> tracks = playlist.getTracks().stream()
-        .map(LavaplayerAudioTrack::new)
-        .collect(Collectors.toList());
-    
-    return new LavaplayerSearchResult(Type.PLAYLIST_LOADED, null, tracks, 
-        playlist.getName(), null);
+    List<dev.cafe.audio.AudioTrack> tracks =
+        playlist.getTracks().stream().map(LavaplayerAudioTrack::new).collect(Collectors.toList());
+
+    return new LavaplayerSearchResult(Type.PLAYLIST_LOADED, null, tracks, playlist.getName(), null);
   }
 
   public static LavaplayerSearchResult searchResult(List<AudioTrack> tracks) {
-    List<dev.cafe.audio.AudioTrack> wrappedTracks = tracks.stream()
-        .map(LavaplayerAudioTrack::new)
-        .collect(Collectors.toList());
-    
-    return new LavaplayerSearchResult(Type.SEARCH_RESULT, null, wrappedTracks, 
-        null, null);
+    List<dev.cafe.audio.AudioTrack> wrappedTracks =
+        tracks.stream().map(LavaplayerAudioTrack::new).collect(Collectors.toList());
+
+    return new LavaplayerSearchResult(Type.SEARCH_RESULT, null, wrappedTracks, null, null);
   }
 
   public static LavaplayerSearchResult noMatches() {
@@ -55,8 +52,7 @@ public class LavaplayerSearchResult implements SearchResult {
   }
 
   public static LavaplayerSearchResult loadFailed(FriendlyException exception) {
-    return new LavaplayerSearchResult(Type.LOAD_FAILED, null, null, null, 
-        exception.getMessage());
+    return new LavaplayerSearchResult(Type.LOAD_FAILED, null, null, null, exception.getMessage());
   }
 
   @Override

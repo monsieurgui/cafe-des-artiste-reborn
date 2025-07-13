@@ -6,13 +6,13 @@ import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
 import javax.inject.Singleton;
 
-/**
- * Dagger component for dependency injection.
- */
+/** Dagger component for dependency injection. */
 @Singleton
 @Component(modules = BotModule.class)
 public interface BotComponent {
   AudioController audioController();
+
   PlaybackStrategy playbackStrategy();
+
   PlaylistManager playlistManager();
 }

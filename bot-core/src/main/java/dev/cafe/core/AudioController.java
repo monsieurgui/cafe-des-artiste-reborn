@@ -17,13 +17,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Coordinates audio playback across guilds with queue management.
- */
+/** Coordinates audio playback across guilds with queue management. */
 @Singleton
 public class AudioController {
   private static final Logger logger = LoggerFactory.getLogger(AudioController.class);
-  
+
   private final AudioSearchService searchService;
   private final PlaybackStrategy playbackStrategy;
   private final MetricsBinder metrics;
@@ -31,20 +29,19 @@ public class AudioController {
   private final ScheduledExecutorService prefetchExecutor = Executors.newScheduledThreadPool(2);
 
   @Inject
-  public AudioController(AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
+  public AudioController(
+      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
     this.searchService = searchService;
     this.playbackStrategy = playbackStrategy;
     this.metrics = metrics;
   }
 
   public CompletableFuture<String> play(long guildId, String query) {
-    return searchService.search(query)
-        .thenApply(result -> handleSearchResult(guildId, result));
+    return searchService.search(query).thenApply(result -> handleSearchResult(guildId, result));
   }
 
   public CompletableFuture<String> playUrl(long guildId, String url) {
-    return searchService.loadTrack(url)
-        .thenApply(result -> handleSearchResult(guildId, result));
+    return searchService.loadTrack(url).thenApply(result -> handleSearchResult(guildId, result));
   }
 
   public CompletableFuture<SearchResult> searchOnly(String query) {
@@ -53,7 +50,7 @@ public class AudioController {
 
   public String playSelectedTrack(long guildId, dev.cafe.audio.AudioTrack track) {
     TrackQueue queue = getOrCreateQueue(guildId);
-    
+
     if (!playbackStrategy.isPlaying(guildId)) {
       startPlayback(guildId, track);
       return "Now playing: " + track.getTitle();
@@ -65,7 +62,7 @@ public class AudioController {
 
   private String handleSearchResult(long guildId, SearchResult result) {
     TrackQueue queue = getOrCreateQueue(guildId);
-    
+
     switch (result.getType()) {
       case TRACK_LOADED:
         AudioTrack track = result.getTrack();
@@ -76,29 +73,37 @@ public class AudioController {
           queue.add(track);
           return "Added to queue: " + track.getTitle();
         }
-        
+
       case PLAYLIST_LOADED:
         List<AudioTrack> tracks = result.getTracks();
         if (tracks.isEmpty()) {
           return "Playlist is empty";
         }
-        
+
         AudioTrack firstTrack = tracks.get(0);
         if (!playbackStrategy.isPlaying(guildId)) {
           startPlayback(guildId, firstTrack);
           tracks.stream().skip(1).forEach(queue::add);
-          return "Playing playlist: " + result.getPlaylistName() + " (" + tracks.size() + " tracks)";
+          return "Playing playlist: "
+              + result.getPlaylistName()
+              + " ("
+              + tracks.size()
+              + " tracks)";
         } else {
           tracks.forEach(queue::add);
-          return "Added playlist to queue: " + result.getPlaylistName() + " (" + tracks.size() + " tracks)";
+          return "Added playlist to queue: "
+              + result.getPlaylistName()
+              + " ("
+              + tracks.size()
+              + " tracks)";
         }
-        
+
       case SEARCH_RESULT:
         List<AudioTrack> searchTracks = result.getTracks();
         if (searchTracks.isEmpty()) {
           return "No tracks found";
         }
-        
+
         AudioTrack searchTrack = searchTracks.get(0);
         if (!playbackStrategy.isPlaying(guildId)) {
           startPlayback(guildId, searchTrack);
@@ -107,13 +112,13 @@ public class AudioController {
           queue.add(searchTrack);
           return "Added to queue: " + searchTrack.getTitle();
         }
-        
+
       case NO_MATCHES:
-        return "No matches found for: " + query;
-        
+        return "No matches found";
+
       case LOAD_FAILED:
         return "Failed to load track: " + result.getErrorMessage();
-        
+
       default:
         return "Unknown search result type";
     }
@@ -122,11 +127,11 @@ public class AudioController {
   public String skip(long guildId) {
     TrackQueue queue = getOrCreateQueue(guildId);
     Optional<AudioTrack> current = queue.current();
-    
+
     if (!current.isPresent()) {
       return "Nothing is currently playing";
     }
-    
+
     Optional<AudioTrack> next = queue.next();
     if (next.isPresent()) {
       startPlayback(guildId, next.get());
@@ -148,7 +153,7 @@ public class AudioController {
     if (!playbackStrategy.isPlaying(guildId)) {
       return "Nothing is currently playing";
     }
-    
+
     playbackStrategy.pausePlayback(guildId);
     return "Playback paused";
   }
@@ -157,7 +162,7 @@ public class AudioController {
     if (!playbackStrategy.isPaused(guildId)) {
       return "Playback is not paused";
     }
-    
+
     playbackStrategy.resumePlayback(guildId);
     return "Playback resumed";
   }
@@ -165,14 +170,14 @@ public class AudioController {
   public String getQueueInfo(long guildId) {
     TrackQueue queue = getOrCreateQueue(guildId);
     Optional<AudioTrack> current = queue.current();
-    
+
     if (!current.isPresent()) {
       return "Nothing is currently playing";
     }
-    
+
     StringBuilder sb = new StringBuilder();
     sb.append("Now playing: ").append(current.get().getTitle()).append("\n");
-    
+
     List<AudioTrack> upcoming = queue.getTracks();
     if (upcoming.isEmpty()) {
       sb.append("Queue is empty");
@@ -185,18 +190,18 @@ public class AudioController {
         sb.append("... and ").append(upcoming.size() - 10).append(" more");
       }
     }
-    
+
     return sb.toString();
   }
 
   public void onTrackEnd(long guildId) {
     TrackQueue queue = getOrCreateQueue(guildId);
     Optional<AudioTrack> next = queue.next();
-    
+
     if (next.isPresent()) {
       startPlayback(guildId, next.get());
       logger.info("Auto-playing next track: {}", next.get().getTitle());
-      
+
       // Prefetch next track in background
       prefetchNextTrack(guildId);
     } else {
@@ -205,20 +210,21 @@ public class AudioController {
   }
 
   private void prefetchNextTrack(long guildId) {
-    prefetchExecutor.submit(() -> {
-      try {
-        TrackQueue queue = getOrCreateQueue(guildId);
-        List<AudioTrack> upcomingTracks = queue.getTracks();
-        
-        if (!upcomingTracks.isEmpty()) {
-          AudioTrack nextTrack = upcomingTracks.get(0);
-          // For Lavaplayer, tracks are already loaded, but we could trigger buffering here
-          logger.debug("Prefetched next track for guild {}: {}", guildId, nextTrack.getTitle());
-        }
-      } catch (Exception e) {
-        logger.warn("Failed to prefetch next track for guild {}", guildId, e);
-      }
-    });
+    prefetchExecutor.submit(
+        () -> {
+          try {
+            TrackQueue queue = getOrCreateQueue(guildId);
+            List<AudioTrack> upcomingTracks = queue.getTracks();
+
+            if (!upcomingTracks.isEmpty()) {
+              AudioTrack nextTrack = upcomingTracks.get(0);
+              // For Lavaplayer, tracks are already loaded, but we could trigger buffering here
+              logger.debug("Prefetched next track for guild {}: {}", guildId, nextTrack.getTitle());
+            }
+          } catch (Exception e) {
+            logger.warn("Failed to prefetch next track for guild {}", guildId, e);
+          }
+        });
   }
 
   private void startPlayback(long guildId, AudioTrack track) {

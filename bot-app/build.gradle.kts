@@ -14,6 +14,8 @@ dependencies {
   implementation("com.google.dagger:dagger:2.48.1")
   annotationProcessor("com.google.dagger:dagger-compiler:2.48.1")
   implementation("ch.qos.logback:logback-classic:1.4.14")
+  implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+  implementation("dev.arbjerg:lavaplayer:2.2.3")  // Ensure AudioEventAdapter is available
 }
 
 application {

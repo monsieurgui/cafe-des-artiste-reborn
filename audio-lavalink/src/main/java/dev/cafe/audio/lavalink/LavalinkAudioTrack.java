@@ -4,9 +4,7 @@ import dev.arbjerg.lavalink.protocol.v4.Track;
 import dev.cafe.audio.AudioTrack;
 import java.time.Duration;
 
-/**
- * Lavalink implementation of AudioTrack.
- */
+/** Lavalink implementation of AudioTrack. */
 public class LavalinkAudioTrack implements AudioTrack {
   private final Track track;
 
@@ -41,7 +39,7 @@ public class LavalinkAudioTrack implements AudioTrack {
 
   @Override
   public boolean isSeekable() {
-    return track.getInfo().getIsSeekable();
+    return track.getInfo().isSeekable();
   }
 
   @Override

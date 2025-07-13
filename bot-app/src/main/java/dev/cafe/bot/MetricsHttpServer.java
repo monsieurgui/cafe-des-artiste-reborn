@@ -16,12 +16,10 @@ import net.dv8tion.jda.api.JDA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Simple HTTP server for Prometheus metrics endpoint.
- */
+/** Simple HTTP server for Prometheus metrics endpoint. */
 public class MetricsHttpServer {
   private static final Logger logger = LoggerFactory.getLogger(MetricsHttpServer.class);
-  
+
   private final MetricsBinder metrics;
   private final ConfigLoader config;
   private final ObjectMapper objectMapper;
@@ -75,30 +73,34 @@ public class MetricsHttpServer {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
       Map<String, Object> health = new HashMap<>();
-      
+
       try {
         // Check bot status
         if (jda != null) {
-          health.put("bot", Map.of(
-              "status", jda.getStatus().name(),
-              "ping", jda.getGatewayPing(),
-              "guilds", jda.getGuilds().size(),
-              "shards", jda.getShardInfo() != null ? 
-                  Map.of("current", jda.getShardInfo().getShardId(), 
-                         "total", jda.getShardInfo().getShardTotal()) : 
-                  Map.of("current", 0, "total", 1)
-          ));
+          health.put(
+              "bot",
+              Map.of(
+                  "status", jda.getStatus().name(),
+                  "ping", jda.getGatewayPing(),
+                  "guilds", jda.getGuilds().size(),
+                  "shards",
+                      jda.getShardInfo() != null
+                          ? Map.of(
+                              "current", jda.getShardInfo().getShardId(),
+                              "total", jda.getShardInfo().getShardTotal())
+                          : Map.of("current", 0, "total", 1)));
         } else {
           health.put("bot", Map.of("status", "NOT_READY"));
         }
 
         // Check Lavalink status if using Lavalink backend
         if ("lavalink".equals(config.getAudioBackend()) && lavalinkService != null) {
-          health.put("lavalink", Map.of(
-              "host", config.getLavalinkHost(),
-              "port", config.getLavalinkPort(),
-              "healthy", lavalinkService.isHealthy()
-          ));
+          health.put(
+              "lavalink",
+              Map.of(
+                  "host", config.getLavalinkHost(),
+                  "port", config.getLavalinkPort(),
+                  "healthy", lavalinkService.isHealthy()));
         } else {
           health.put("audio", Map.of("backend", config.getAudioBackend()));
         }
@@ -116,7 +118,7 @@ public class MetricsHttpServer {
         logger.error("Health check failed", e);
         health.put("status", "DOWN");
         health.put("error", e.getMessage());
-        
+
         String response = objectMapper.writeValueAsString(health);
         exchange.getResponseHeaders().set("Content-Type", "application/json");
         exchange.sendResponseHeaders(500, response.getBytes().length);

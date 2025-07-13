@@ -1,7 +1,6 @@
 package dev.cafe.bot;
 
 import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
-import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
 import net.dv8tion.jda.api.JDA;
@@ -10,9 +9,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Main entry point for the Cafe des Artistes Discord bot.
- */
+/** Main entry point for the Cafe des Artistes Discord bot. */
 public class Main {
   private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
@@ -29,10 +26,11 @@ public class Main {
       AudioController audioController = component.audioController();
       PlaylistManager playlistManager = component.playlistManager();
 
-      JDA jda = JDABuilder.createDefault(token)
-          .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
-          .addEventListeners(new AudioCommands(audioController, playlistManager))
-          .build();
+      JDA jda =
+          JDABuilder.createDefault(token)
+              .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
+              .addEventListeners(new AudioCommands(audioController, playlistManager))
+              .build();
 
       // Set JDA on playback strategy after JDA is built
       if (component.playbackStrategy() instanceof LavaplayerPlaybackStrategy) {

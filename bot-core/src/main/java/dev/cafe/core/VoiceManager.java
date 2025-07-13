@@ -7,18 +7,15 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Manages voice channel connections and audio send handlers.
- */
+/** Manages voice channel connections and audio send handlers. */
 @Singleton
 public class VoiceManager {
   private static final Logger logger = LoggerFactory.getLogger(VoiceManager.class);
-  
+
   private final ConcurrentMap<Long, Long> guildVoiceChannels = new ConcurrentHashMap<>();
 
   @Inject
-  public VoiceManager() {
-  }
+  public VoiceManager() {}
 
   public void joinVoiceChannel(long guildId, long voiceChannelId) {
     guildVoiceChannels.put(guildId, voiceChannelId);

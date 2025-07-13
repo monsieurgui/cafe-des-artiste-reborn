@@ -6,9 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 import java.nio.ByteBuffer;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
 
-/**
- * AudioSendHandler implementation for Lavaplayer that provides 20ms Opus frames to Discord.
- */
+/** AudioSendHandler implementation for Lavaplayer that provides 20ms Opus frames to Discord. */
 public class LavaplayerAudioSendHandler implements AudioSendHandler {
   private final AudioPlayer audioPlayer;
   private final ByteBuffer buffer;

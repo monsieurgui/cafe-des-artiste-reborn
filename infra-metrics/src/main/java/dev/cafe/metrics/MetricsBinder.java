@@ -10,9 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * Prometheus metrics collector for bot performance monitoring.
- */
+/** Prometheus metrics collector for bot performance monitoring. */
 @Singleton
 public class MetricsBinder {
   private final PrometheusMeterRegistry meterRegistry;
@@ -25,29 +23,32 @@ public class MetricsBinder {
   @Inject
   public MetricsBinder() {
     this.meterRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
-    
+
     // Command metrics
-    this.commandsExecuted = Counter.builder("bot.commands.executed")
-        .description("Number of slash commands executed")
-        .tag("type", "audio")
-        .register(meterRegistry);
-    
-    this.commandLatency = Timer.builder("bot.commands.latency")
-        .description("Command execution latency")
-        .register(meterRegistry);
-    
+    this.commandsExecuted =
+        Counter.builder("bot.commands.executed")
+            .description("Number of slash commands executed")
+            .tag("type", "audio")
+            .register(meterRegistry);
+
+    this.commandLatency =
+        Timer.builder("bot.commands.latency")
+            .description("Command execution latency")
+            .register(meterRegistry);
+
     // Audio metrics
-    this.tracksPlayed = Counter.builder("bot.tracks.played")
-        .description("Total tracks played")
-        .register(meterRegistry);
-    
-    Gauge.builder("bot.guilds.active")
+    this.tracksPlayed =
+        Counter.builder("bot.tracks.played")
+            .description("Total tracks played")
+            .register(meterRegistry);
+
+    Gauge.builder("bot.guilds.active", this, m -> m.activeGuilds.get())
         .description("Number of active guilds")
-        .register(meterRegistry, this, m -> m.activeGuilds.get());
-    
-    Gauge.builder("bot.tracks.queued")
+        .register(meterRegistry);
+
+    Gauge.builder("bot.tracks.queued", this, m -> m.queuedTracks.get())
         .description("Total tracks in all queues")
-        .register(meterRegistry, this, m -> m.queuedTracks.get());
+        .register(meterRegistry);
   }
 
   public void recordCommandExecuted(String commandName) {
