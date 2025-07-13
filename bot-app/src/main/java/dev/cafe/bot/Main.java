@@ -32,11 +32,13 @@ public class Main {
       AudioController audioController = component.audioController();
       PlaylistManager playlistManager = component.playlistManager();
       CacheCommands cacheCommands = component.cacheCommands();
+      SetupCommands setupCommands = component.setupCommands();
 
       JDA jda =
           JDABuilder.createDefault(token)
               .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
-              .addEventListeners(new AudioCommands(audioController, playlistManager), cacheCommands)
+              .addEventListeners(
+                  new AudioCommands(audioController, playlistManager), cacheCommands, setupCommands)
               .build();
 
       // Set JDA on playback strategy after JDA is built

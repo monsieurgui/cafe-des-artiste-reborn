@@ -106,6 +106,8 @@ public final class DaggerBotComponent {
 
     private Provider<SqliteGuildSettingsRepository> sqliteGuildSettingsRepositoryProvider;
 
+    private Provider<SetupCommands> setupCommandsProvider;
+
     private BotComponentImpl(BotModule botModuleParam, CacheModule cacheModuleParam) {
 
       initialize(botModuleParam, cacheModuleParam);
@@ -127,6 +129,7 @@ public final class DaggerBotComponent {
       this.provideDatabaseUrlProvider = DoubleCheck.provider(CacheModule_ProvideDatabaseUrlFactory.create(cacheModuleParam, provideConfigLoaderProvider));
       this.provideDataSourceProvider = DoubleCheck.provider(CacheModule_ProvideDataSourceFactory.create(cacheModuleParam, provideDatabaseUrlProvider));
       this.sqliteGuildSettingsRepositoryProvider = DoubleCheck.provider(SqliteGuildSettingsRepository_Factory.create(provideDataSourceProvider));
+      this.setupCommandsProvider = DoubleCheck.provider(SetupCommands_Factory.create(((Provider) sqliteGuildSettingsRepositoryProvider)));
     }
 
     @Override
@@ -152,6 +155,11 @@ public final class DaggerBotComponent {
     @Override
     public GuildSettingsRepository guildSettingsRepository() {
       return sqliteGuildSettingsRepositoryProvider.get();
+    }
+
+    @Override
+    public SetupCommands setupCommands() {
+      return setupCommandsProvider.get();
     }
   }
 }

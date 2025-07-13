@@ -8,7 +8,6 @@
 
 | # | Task (Conventional-Commit style) | Acceptance criteria |
 |---|----------------------------------|---------------------|
-| 1 | **chore(data): add GuildSettings table (SQLite)** | Table `guild_settings` columns: `guildId PK`, `channelId`, `queueMsgId`, `nowPlayingMsgId`; DAO tests green. |
 | 2 | **feat(setup): introduce `/setup` slash command (guild-only)** | Requires `Administrator` permission; responds with ephemeral “Check your DMs”. |
 | 3 | **feat(dm): implement whisper flow** | Bot DMs the invoking admin:<br>  a. asks “Link a text channel for queue/now-playing?”<br>  b. waits for channel mention reply (timeout 2 min).<br>  c. validates bot has `SEND_MESSAGES` & `MANAGE_MESSAGES` in that channel.<br>  d. stores `channelId` in `guild_settings`. |
 | 4 | **feat(posts): create two pinned messages in linked channel** | a. Top message content: “🎶 **Queue** (auto-updated)”<br>b. Second message: “▶️ **Now playing…**” placeholder.<br>Both IDs stored in DB; messages pinned. |
@@ -25,3 +24,4 @@
 
 | # | Commit | Description |
 |---|--------|-------------|
+| 1 | d46c18d | **chore(data): add GuildSettings table (SQLite)** |

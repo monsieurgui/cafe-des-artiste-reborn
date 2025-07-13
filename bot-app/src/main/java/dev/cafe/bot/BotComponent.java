@@ -22,4 +22,6 @@ public interface BotComponent {
   CacheCommands cacheCommands();
 
   GuildSettingsRepository guildSettingsRepository();
+
+  SetupCommands setupCommands();
 }
