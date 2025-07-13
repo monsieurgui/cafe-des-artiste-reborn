@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="dev.cafe.cache.MostPlayedServiceTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-13T02:11:53.321Z" hostname="Mac" time="0.448">
+<testsuite name="dev.cafe.cache.MostPlayedServiceTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2025-07-13T02:24:44.705Z" hostname="Mac" time="0.473">
   <properties/>
-  <testcase name="incrementPlayCount_forExistingVideo_incrementsCount()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.44"/>
+  <testcase name="setCached_setsFlagToTrue()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.46"/>
+  <testcase name="incrementPlayCount_forExistingVideo_incrementsCount()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.002"/>
   <testcase name="serviceClosed_throwsException()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.003"/>
+  <testcase name="isCached_forNewVideo_isFalse()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
   <testcase name="getPlayCount_forNewVideo_returnsZero()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
-  <testcase name="incrementPlayCount_forNewVideo_setsCountToOne()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
+  <testcase name="incrementPlayCount_forNewVideo_returnsOne()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
   <testcase name="getPlayCount_withMultipleVideos()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[SLF4J: No SLF4J providers were found.
