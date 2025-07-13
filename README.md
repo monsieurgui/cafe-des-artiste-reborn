@@ -11,8 +11,7 @@ A high-performance, modular Discord music bot built with Java 21. Features dual 
 - 🎶 **Multi-Source Audio**: YouTube, SoundCloud, Bandcamp, Vimeo, Twitch streams
 - 🔧 **Dual Audio Backends**: Choose between Lavaplayer (embedded) or Lavalink (server)
 - 📋 **Playlist Management**: Create, save, and share custom playlists
-- ⚡ **High Performance**: ≤50ms command latency with concurrent guild support
-- 📊 **Built-in Monitoring**: Prometheus metrics and health endpoints
+- 🤝 **Auto-Join**: Bot automatically joins your voice channel on play commands
 - 🐳 **Docker Ready**: One-command deployment with Docker Compose
 - 🔄 **Hot-Reloadable**: Configuration updates without restarts
 - 🏗️ **Modular Architecture**: Clean separation of concerns
@@ -120,29 +119,23 @@ audio {
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `/play <query>` | Play a song or add to queue | `query`: Song name or URL<br>`search`: Show search results (optional) |
-| `/search <query>` | Search for tracks | `query`: Song name |
+| `/play` | Play a song or add to queue | `query`: Song name or URL<br>`search`: Show search results (optional) |
+| `/search` | Search for tracks | `query`: Song name |
 | `/skip` | Skip current song | None |
 | `/stop` | Stop and clear queue | None |
-| `/pause` | Pause playback | None |
-| `/resume` | Resume playback | None |
 | `/queue` | Show current queue | None |
 
 ### Voice Controls
 
 | Command | Description |
 |---------|-------------|
-| `/join` | Join your voice channel |
 | `/leave` | Leave voice channel |
 
 ### Playlists
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `/playlist create <name>` | Create new playlist | `name`: Playlist name |
-| `/playlist list` | Show your playlists | None |
-| `/playlist load <id>` | Load playlist to queue | `id`: Playlist ID |
-| `/playlist show <id>` | Display playlist contents | `id`: Playlist ID |
+| `/playlist` | Manage playlists | `action`: `create`, `list`, `load`, `show`<br>`name`: (for `create`)<br>`id`: (for `load`, `show`) |
 
 ### Utility
 
@@ -154,21 +147,20 @@ audio {
 
 ### Basic Playback
 ```
-/join                    # Bot joins your voice channel
-/play Rick Astley        # Searches and plays "Rick Astley"
-/play search:true Beethoven  # Shows search results to choose from
-/play https://youtube.com/watch?v=... # Direct URL playback
+/play Rick Astley        # Bot auto-joins and plays "Rick Astley"
+/play query:https://youtube.com/watch?v=... # Direct URL playback
+/play query:Beethoven search:true  # Shows search results to choose from
 /queue                   # View current queue
 /skip                    # Skip to next song
+/stop                    # Stop playback and clear the queue
 ```
 
 ### Playlist Management
 ```
-/playlist create My Favorites     # Create playlist
-/search My Chemical Romance       # Search for tracks
-[Click ➕ button on results]      # Add to playlist
-/playlist list                    # View your playlists
-/playlist load 550e8400-e29b-...  # Load playlist to queue
+/playlist action:create name:My Favorites  # Create a new playlist
+/playlist action:list                      # View your playlists
+/playlist action:load id:550e8400-e29b-...   # Load a playlist into the queue
+/playlist action:show id:550e8400-e29b-...   # Show tracks in a playlist
 ```
 
 ### Supported Sources
@@ -303,7 +295,8 @@ docker push your-registry/cafe-des-artistes:v1.0.0
 - ✅ Check Docker logs: `docker-compose logs bot`
 
 #### Audio doesn't play
-- ✅ Bot must be in a voice channel: `/join` first
+- ✅ Ensure bot has permissions to join and speak
+- ✅ Bot should auto-join, no `/join` needed
 - ✅ Check audio backend status in `/health` endpoint
 - ✅ For Lavalink: verify Lavalink server is running
 - ✅ For YouTube: ensure plugin is working

@@ -1,0 +1,31 @@
+# Gradle cache
+.gradle
+/build/
+
+# IDE configuration files
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+.cursor/
+
+# Log files
+*.log
+logs/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+*~
+
+# Local development files
+.env
+local.properties
+
+# Crash reports
+hs_err_pid*
+replay_pid* 
