@@ -4,8 +4,11 @@ import dagger.Module;
 import dagger.Provides;
 import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.PlaybackStrategy;
+import dev.cafe.audio.lavalink.LavalinkPlaybackStrategy;
+import dev.cafe.audio.lavalink.LavalinkSearchService;
 import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
+import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.VoiceManager;
 import dev.cafe.metrics.MetricsBinder;
@@ -19,14 +22,32 @@ public class BotModule {
 
   @Provides
   @Singleton
-  AudioSearchService provideAudioSearchService() {
-    return new LavaplayerSearchService();
+  ConfigLoader provideConfigLoader() {
+    return new ConfigLoader();
   }
 
   @Provides
   @Singleton
-  PlaybackStrategy providePlaybackStrategy(LavaplayerSearchService searchService) {
-    return new LavaplayerPlaybackStrategy(searchService);
+  AudioSearchService provideAudioSearchService(ConfigLoader config) {
+    String backend = config.getAudioBackend();
+    if ("lavalink".equals(backend)) {
+      return new LavalinkSearchService(config.getLavalinkHost(), 
+          config.getLavalinkPort(), config.getLavalinkPassword());
+    } else {
+      return new LavaplayerSearchService();
+    }
+  }
+
+  @Provides
+  @Singleton
+  PlaybackStrategy providePlaybackStrategy(ConfigLoader config, AudioSearchService searchService) {
+    String backend = config.getAudioBackend();
+    if ("lavalink".equals(backend)) {
+      return new LavalinkPlaybackStrategy(config.getLavalinkHost(), 
+          config.getLavalinkPort(), config.getLavalinkPassword());
+    } else {
+      return new LavaplayerPlaybackStrategy((LavaplayerSearchService) searchService);
+    }
   }
 
   @Provides

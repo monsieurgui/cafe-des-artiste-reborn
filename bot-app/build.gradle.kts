@@ -6,6 +6,7 @@ plugins {
 dependencies {
   implementation(project(":bot-core"))
   implementation(project(":audio-lavaplayer"))
+  implementation(project(":audio-lavalink"))
   implementation(project(":infra-config"))
   implementation(project(":infra-metrics"))
   

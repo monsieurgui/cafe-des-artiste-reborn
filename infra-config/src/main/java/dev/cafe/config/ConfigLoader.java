@@ -24,4 +24,19 @@ public class ConfigLoader {
   public String getAudioBackend() {
     return config.hasPath("audio.backend") ? config.getString("audio.backend") : "lavaplayer";
   }
+
+  public String getLavalinkHost() {
+    return config.hasPath("audio.lavalink.host") ? 
+        config.getString("audio.lavalink.host") : "lavalink";
+  }
+
+  public int getLavalinkPort() {
+    return config.hasPath("audio.lavalink.port") ? 
+        config.getInt("audio.lavalink.port") : 2333;
+  }
+
+  public String getLavalinkPassword() {
+    return config.hasPath("audio.lavalink.password") ? 
+        config.getString("audio.lavalink.password") : "youshallnotpass";
+  }
 }

@@ -10,3 +10,8 @@
 • 2025-01-13: Track prefetching system implemented in AudioController using ScheduledExecutorService to prevent gateway blocking during queue transitions.
 • 2025-01-13: Micrometer Prometheus metrics implemented in infra-metrics with command latency, tracks played, active guilds, and queue size monitoring.
 • 2025-01-13: Dockerfile created with distroless Java 21 base image, docker-compose.yml with Prometheus integration, /metrics and /health endpoints.
+• 2025-01-13: Lavalink 4.0.7 integration implemented with audio-lavalink module, LavalinkSearchService, LavalinkPlaybackStrategy for external audio processing.
+• 2025-01-13: Configuration system enhanced to support backend switching between Lavaplayer and Lavalink via AUDIO_BACKEND environment variable.
+• 2025-01-13: GitHub Actions CI/CD pipeline created with testing, Docker build/push to GHCR, security scanning with Trivy, and automated deployments.
+• 2025-01-13: Enhanced health endpoint with JSON response including JDA shard status, gateway ping, guild count, and Lavalink connectivity monitoring.
+• 2025-01-13: Docker Compose updated with Lavalink 4.0.7 service, health checks, dependency management, and Prometheus scraping configuration.

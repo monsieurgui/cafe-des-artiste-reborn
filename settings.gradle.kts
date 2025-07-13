@@ -5,6 +5,7 @@ include(
   "bot-core",
   "audio-common",
   "audio-lavaplayer",
+  "audio-lavalink",
   "infra-config",
   "infra-metrics"
 )
