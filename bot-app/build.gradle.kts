@@ -9,6 +9,7 @@ dependencies {
   implementation(project(":audio-lavalink"))
   implementation(project(":infra-config"))
   implementation(project(":infra-metrics"))
+  implementation(project(":infra-cache"))
   
   implementation("net.dv8tion:JDA:5.5.1")
   implementation("com.google.dagger:dagger:2.48.1")

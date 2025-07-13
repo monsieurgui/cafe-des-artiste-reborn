@@ -27,6 +27,11 @@ public class LavaplayerAudioTrack implements AudioTrack {
   }
 
   @Override
+  public String getVideoId() {
+    return lavaTrack.getIdentifier();
+  }
+
+  @Override
   public Duration getDuration() {
     return Duration.ofMillis(lavaTrack.getDuration());
   }

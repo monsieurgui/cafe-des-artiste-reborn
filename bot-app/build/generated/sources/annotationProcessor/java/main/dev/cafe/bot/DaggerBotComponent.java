@@ -5,6 +5,11 @@ import dagger.internal.DoubleCheck;
 import dagger.internal.Preconditions;
 import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.PlaybackStrategy;
+import dev.cafe.cache.MostPlayedService;
+import dev.cafe.cache.TrackCacheService;
+import dev.cafe.cache.dagger.CacheModule;
+import dev.cafe.cache.dagger.CacheModule_ProvideMostPlayedServiceFactory;
+import dev.cafe.cache.dagger.CacheModule_ProvideTrackCacheServiceFactory;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
@@ -38,6 +43,8 @@ public final class DaggerBotComponent {
   public static final class Builder {
     private BotModule botModule;
 
+    private CacheModule cacheModule;
+
     private Builder() {
     }
 
@@ -46,11 +53,19 @@ public final class DaggerBotComponent {
       return this;
     }
 
+    public Builder cacheModule(CacheModule cacheModule) {
+      this.cacheModule = Preconditions.checkNotNull(cacheModule);
+      return this;
+    }
+
     public BotComponent build() {
       if (botModule == null) {
         this.botModule = new BotModule();
       }
-      return new BotComponentImpl(botModule);
+      if (cacheModule == null) {
+        this.cacheModule = new CacheModule();
+      }
+      return new BotComponentImpl(botModule, cacheModule);
     }
   }
 
@@ -65,23 +80,29 @@ public final class DaggerBotComponent {
 
     private Provider<MetricsBinder> provideMetricsBinderProvider;
 
+    private Provider<MostPlayedService> provideMostPlayedServiceProvider;
+
+    private Provider<TrackCacheService> provideTrackCacheServiceProvider;
+
     private Provider<AudioController> provideAudioControllerProvider;
 
     private Provider<PlaylistManager> providePlaylistManagerProvider;
 
-    private BotComponentImpl(BotModule botModuleParam) {
+    private BotComponentImpl(BotModule botModuleParam, CacheModule cacheModuleParam) {
 
-      initialize(botModuleParam);
+      initialize(botModuleParam, cacheModuleParam);
 
     }
 
     @SuppressWarnings("unchecked")
-    private void initialize(final BotModule botModuleParam) {
+    private void initialize(final BotModule botModuleParam, final CacheModule cacheModuleParam) {
       this.provideConfigLoaderProvider = DoubleCheck.provider(BotModule_ProvideConfigLoaderFactory.create(botModuleParam));
       this.provideAudioSearchServiceProvider = DoubleCheck.provider(BotModule_ProvideAudioSearchServiceFactory.create(botModuleParam, provideConfigLoaderProvider));
       this.providePlaybackStrategyProvider = DoubleCheck.provider(BotModule_ProvidePlaybackStrategyFactory.create(botModuleParam, provideConfigLoaderProvider, provideAudioSearchServiceProvider));
       this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
-      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, providePlaybackStrategyProvider, provideMetricsBinderProvider));
+      this.provideMostPlayedServiceProvider = DoubleCheck.provider(CacheModule_ProvideMostPlayedServiceFactory.create(cacheModuleParam));
+      this.provideTrackCacheServiceProvider = DoubleCheck.provider(CacheModule_ProvideTrackCacheServiceFactory.create(cacheModuleParam));
+      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, providePlaybackStrategyProvider, provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
       this.providePlaylistManagerProvider = DoubleCheck.provider(BotModule_ProvidePlaylistManagerFactory.create(botModuleParam));
     }
 

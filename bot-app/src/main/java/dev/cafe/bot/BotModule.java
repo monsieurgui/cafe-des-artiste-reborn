@@ -8,6 +8,8 @@ import dev.cafe.audio.lavalink.LavalinkPlaybackStrategy;
 import dev.cafe.audio.lavalink.LavalinkSearchService;
 import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
+import dev.cafe.cache.MostPlayedService;
+import dev.cafe.cache.TrackCacheService;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
@@ -70,8 +72,14 @@ public class BotModule {
   @Provides
   @Singleton
   AudioController provideAudioController(
-      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
-    AudioController controller = new AudioController(searchService, playbackStrategy, metrics);
+      AudioSearchService searchService,
+      PlaybackStrategy playbackStrategy,
+      MetricsBinder metrics,
+      MostPlayedService mostPlayedService,
+      TrackCacheService trackCacheService) {
+    AudioController controller =
+        new AudioController(
+            searchService, playbackStrategy, metrics, mostPlayedService, trackCacheService);
 
     // Set up circular dependency
     if (playbackStrategy instanceof LavaplayerPlaybackStrategy) {

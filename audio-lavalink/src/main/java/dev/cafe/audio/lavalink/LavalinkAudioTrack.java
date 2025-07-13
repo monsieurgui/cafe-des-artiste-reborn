@@ -28,6 +28,11 @@ public class LavalinkAudioTrack implements AudioTrack {
   }
 
   @Override
+  public String getVideoId() {
+    return track.getInfo().getIdentifier();
+  }
+
+  @Override
   public Duration getDuration() {
     return Duration.ofMillis(track.getInfo().getLength());
   }

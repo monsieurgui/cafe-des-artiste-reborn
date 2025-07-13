@@ -10,6 +10,8 @@ public interface AudioTrack {
 
   String getUrl();
 
+  String getVideoId();
+
   Duration getDuration();
 
   String getArtworkUrl();

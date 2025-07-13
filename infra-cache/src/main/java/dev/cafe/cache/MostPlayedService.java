@@ -28,8 +28,27 @@ public class MostPlayedService implements AutoCloseable {
       statement.execute(
           "CREATE TABLE IF NOT EXISTS play_counts ("
               + "videoId TEXT PRIMARY KEY, "
-              + "count INTEGER NOT NULL DEFAULT 0"
+              + "count INTEGER NOT NULL DEFAULT 0, "
+              + "cached BOOLEAN NOT NULL DEFAULT FALSE"
               + ")");
+    }
+    // This is a simple way to handle schema migration. For a real application, a more robust
+    // migration library would be better.
+    try (Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("PRAGMA table_info(play_counts)")) {
+      boolean cachedColumnExists = false;
+      while (rs.next()) {
+        if ("cached".equalsIgnoreCase(rs.getString("name"))) {
+          cachedColumnExists = true;
+          break;
+        }
+      }
+      if (!cachedColumnExists) {
+        try (Statement alterStatement = connection.createStatement()) {
+          alterStatement.execute(
+              "ALTER TABLE play_counts ADD COLUMN cached BOOLEAN NOT NULL DEFAULT FALSE");
+        }
+      }
     }
   }
 
@@ -37,16 +56,23 @@ public class MostPlayedService implements AutoCloseable {
    * Increments the play count for a given video ID.
    *
    * @param videoId the ID of the video.
+   * @return the new play count.
    * @throws SQLException if a database access error occurs.
    */
-  public void incrementPlayCount(String videoId) throws SQLException {
+  public int incrementPlayCount(String videoId) throws SQLException {
     String sql =
         "INSERT INTO play_counts (videoId, count) VALUES (?, 1) "
-            + "ON CONFLICT(videoId) DO UPDATE SET count = count + 1";
+            + "ON CONFLICT(videoId) DO UPDATE SET count = count + 1 "
+            + "RETURNING count";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
       pstmt.setString(1, videoId);
-      pstmt.executeUpdate();
+      ResultSet rs = pstmt.executeQuery();
+      if (rs.next()) {
+        return rs.getInt(1);
+      }
     }
+    // This should not be reached in normal operation
+    return getPlayCount(videoId);
   }
 
   /**
@@ -66,6 +92,39 @@ public class MostPlayedService implements AutoCloseable {
       }
     }
     return 0;
+  }
+
+  /**
+   * Checks if a track is marked as cached.
+   *
+   * @param videoId the ID of the video.
+   * @return true if the track is cached, false otherwise.
+   * @throws SQLException if a database access error occurs.
+   */
+  public boolean isCached(String videoId) throws SQLException {
+    String sql = "SELECT cached FROM play_counts WHERE videoId = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setString(1, videoId);
+      ResultSet rs = pstmt.executeQuery();
+      if (rs.next()) {
+        return rs.getBoolean("cached");
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Marks a track as cached.
+   *
+   * @param videoId the ID of the video.
+   * @throws SQLException if a database access error occurs.
+   */
+  public void setCached(String videoId) throws SQLException {
+    String sql = "UPDATE play_counts SET cached = TRUE WHERE videoId = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+      pstmt.setString(1, videoId);
+      pstmt.executeUpdate();
+    }
   }
 
   @Override

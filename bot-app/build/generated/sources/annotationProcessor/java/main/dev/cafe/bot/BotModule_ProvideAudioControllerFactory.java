@@ -7,6 +7,8 @@ import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
 import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.PlaybackStrategy;
+import dev.cafe.cache.MostPlayedService;
+import dev.cafe.cache.TrackCacheService;
 import dev.cafe.core.AudioController;
 import dev.cafe.metrics.MetricsBinder;
 import javax.annotation.processing.Generated;
@@ -34,30 +36,39 @@ public final class BotModule_ProvideAudioControllerFactory implements Factory<Au
 
   private final Provider<MetricsBinder> metricsProvider;
 
+  private final Provider<MostPlayedService> mostPlayedServiceProvider;
+
+  private final Provider<TrackCacheService> trackCacheServiceProvider;
+
   public BotModule_ProvideAudioControllerFactory(BotModule module,
       Provider<AudioSearchService> searchServiceProvider,
-      Provider<PlaybackStrategy> playbackStrategyProvider,
-      Provider<MetricsBinder> metricsProvider) {
+      Provider<PlaybackStrategy> playbackStrategyProvider, Provider<MetricsBinder> metricsProvider,
+      Provider<MostPlayedService> mostPlayedServiceProvider,
+      Provider<TrackCacheService> trackCacheServiceProvider) {
     this.module = module;
     this.searchServiceProvider = searchServiceProvider;
     this.playbackStrategyProvider = playbackStrategyProvider;
     this.metricsProvider = metricsProvider;
+    this.mostPlayedServiceProvider = mostPlayedServiceProvider;
+    this.trackCacheServiceProvider = trackCacheServiceProvider;
   }
 
   @Override
   public AudioController get() {
-    return provideAudioController(module, searchServiceProvider.get(), playbackStrategyProvider.get(), metricsProvider.get());
+    return provideAudioController(module, searchServiceProvider.get(), playbackStrategyProvider.get(), metricsProvider.get(), mostPlayedServiceProvider.get(), trackCacheServiceProvider.get());
   }
 
   public static BotModule_ProvideAudioControllerFactory create(BotModule module,
       Provider<AudioSearchService> searchServiceProvider,
-      Provider<PlaybackStrategy> playbackStrategyProvider,
-      Provider<MetricsBinder> metricsProvider) {
-    return new BotModule_ProvideAudioControllerFactory(module, searchServiceProvider, playbackStrategyProvider, metricsProvider);
+      Provider<PlaybackStrategy> playbackStrategyProvider, Provider<MetricsBinder> metricsProvider,
+      Provider<MostPlayedService> mostPlayedServiceProvider,
+      Provider<TrackCacheService> trackCacheServiceProvider) {
+    return new BotModule_ProvideAudioControllerFactory(module, searchServiceProvider, playbackStrategyProvider, metricsProvider, mostPlayedServiceProvider, trackCacheServiceProvider);
   }
 
   public static AudioController provideAudioController(BotModule instance,
-      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
-    return Preconditions.checkNotNullFromProvides(instance.provideAudioController(searchService, playbackStrategy, metrics));
+      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics,
+      MostPlayedService mostPlayedService, TrackCacheService trackCacheService) {
+    return Preconditions.checkNotNullFromProvides(instance.provideAudioController(searchService, playbackStrategy, metrics, mostPlayedService, trackCacheService));
   }
 }

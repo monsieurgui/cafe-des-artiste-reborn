@@ -4,7 +4,10 @@ import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.AudioTrack;
 import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.audio.SearchResult;
+import dev.cafe.cache.MostPlayedService;
+import dev.cafe.cache.TrackCacheService;
 import dev.cafe.metrics.MetricsBinder;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -21,19 +24,28 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class AudioController {
   private static final Logger logger = LoggerFactory.getLogger(AudioController.class);
+  private static final int CACHE_THRESHOLD = 5;
 
   private final AudioSearchService searchService;
   private final PlaybackStrategy playbackStrategy;
   private final MetricsBinder metrics;
+  private final MostPlayedService mostPlayedService;
+  private final TrackCacheService trackCacheService;
   private final ConcurrentMap<Long, TrackQueue> guildQueues = new ConcurrentHashMap<>();
   private final ScheduledExecutorService prefetchExecutor = Executors.newScheduledThreadPool(2);
 
   @Inject
   public AudioController(
-      AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
+      AudioSearchService searchService,
+      PlaybackStrategy playbackStrategy,
+      MetricsBinder metrics,
+      MostPlayedService mostPlayedService,
+      TrackCacheService trackCacheService) {
     this.searchService = searchService;
     this.playbackStrategy = playbackStrategy;
     this.metrics = metrics;
+    this.mostPlayedService = mostPlayedService;
+    this.trackCacheService = trackCacheService;
   }
 
   public CompletableFuture<String> play(long guildId, String query) {
@@ -231,6 +243,22 @@ public class AudioController {
     playbackStrategy.startPlayback(guildId, track);
     metrics.recordTrackPlayed();
     logger.info("Started playback for guild {}: {}", guildId, track.getTitle());
+    handleCaching(track);
+  }
+
+  private void handleCaching(AudioTrack track) {
+    if (mostPlayedService == null) {
+      return; // Service failed to initialize
+    }
+    try {
+      int playCount = mostPlayedService.incrementPlayCount(track.getVideoId());
+      if (playCount >= CACHE_THRESHOLD && !mostPlayedService.isCached(track.getVideoId())) {
+        trackCacheService.cacheTrack(track.getVideoId());
+        mostPlayedService.setCached(track.getVideoId());
+      }
+    } catch (SQLException e) {
+      logger.error("Failed to update play count for track {}", track.getVideoId(), e);
+    }
   }
 
   private TrackQueue getOrCreateQueue(long guildId) {
