@@ -121,22 +121,27 @@ jobs:
     permissions:
       actions: read # Needed for upload-sarif to get workflow run info.
       contents: read
-      security-events: write
+      security-events: write # Required to upload SARIF results
     
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@0.20.0 # Pinned to a specific version for stability
       with:
         scan-type: 'fs'
         scan-ref: '.'
         format: 'sarif'
         output: 'trivy-results.sarif'
+        # Optional: Add severity levels to scan for, e.g., 'UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL'
+        severity: 'HIGH,CRITICAL'
         
     - name: Upload Trivy scan results
       uses: github/codeql-action/upload-sarif@v3
+      # The 'always()' condition ensures this step runs even if Trivy finds vulnerabilities and fails the previous step
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
+        # Add a category to distinguish these results in the GitHub UI
+        category: trivy
