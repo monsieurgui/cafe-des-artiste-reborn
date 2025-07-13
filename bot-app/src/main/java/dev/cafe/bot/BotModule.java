@@ -7,6 +7,8 @@ import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
 import dev.cafe.core.AudioController;
+import dev.cafe.core.VoiceManager;
+import dev.cafe.metrics.MetricsBinder;
 import javax.inject.Singleton;
 
 /**
@@ -29,9 +31,22 @@ public class BotModule {
 
   @Provides
   @Singleton
+  VoiceManager provideVoiceManager() {
+    return new VoiceManager();
+  }
+
+  @Provides
+  @Singleton
+  MetricsBinder provideMetricsBinder() {
+    return new MetricsBinder();
+  }
+
+  @Provides
+  @Singleton
   AudioController provideAudioController(AudioSearchService searchService, 
-                                         PlaybackStrategy playbackStrategy) {
-    AudioController controller = new AudioController(searchService, playbackStrategy);
+                                         PlaybackStrategy playbackStrategy,
+                                         MetricsBinder metrics) {
+    AudioController controller = new AudioController(searchService, playbackStrategy, metrics);
     
     // Set up circular dependency
     if (playbackStrategy instanceof LavaplayerPlaybackStrategy) {

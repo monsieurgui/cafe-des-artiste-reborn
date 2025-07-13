@@ -1,5 +1,6 @@
 package dev.cafe.bot;
 
+import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import net.dv8tion.jda.api.JDA;
@@ -30,6 +31,11 @@ public class Main {
           .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
           .addEventListeners(new AudioCommands(audioController))
           .build();
+
+      // Set JDA on playback strategy after JDA is built
+      if (component.playbackStrategy() instanceof LavaplayerPlaybackStrategy) {
+        ((LavaplayerPlaybackStrategy) component.playbackStrategy()).setJDA(jda);
+      }
 
       jda.awaitReady();
       logger.info("Bot is ready!");

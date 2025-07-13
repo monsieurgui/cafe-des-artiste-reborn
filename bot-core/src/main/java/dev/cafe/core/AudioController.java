@@ -4,11 +4,14 @@ import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.AudioTrack;
 import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.audio.SearchResult;
+import dev.cafe.metrics.MetricsBinder;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
@@ -23,12 +26,15 @@ public class AudioController {
   
   private final AudioSearchService searchService;
   private final PlaybackStrategy playbackStrategy;
+  private final MetricsBinder metrics;
   private final ConcurrentMap<Long, TrackQueue> guildQueues = new ConcurrentHashMap<>();
+  private final ScheduledExecutorService prefetchExecutor = Executors.newScheduledThreadPool(2);
 
   @Inject
-  public AudioController(AudioSearchService searchService, PlaybackStrategy playbackStrategy) {
+  public AudioController(AudioSearchService searchService, PlaybackStrategy playbackStrategy, MetricsBinder metrics) {
     this.searchService = searchService;
     this.playbackStrategy = playbackStrategy;
+    this.metrics = metrics;
   }
 
   public CompletableFuture<String> play(long guildId, String query) {
@@ -174,13 +180,34 @@ public class AudioController {
     if (next.isPresent()) {
       startPlayback(guildId, next.get());
       logger.info("Auto-playing next track: {}", next.get().getTitle());
+      
+      // Prefetch next track in background
+      prefetchNextTrack(guildId);
     } else {
       logger.info("Queue is empty for guild {}", guildId);
     }
   }
 
+  private void prefetchNextTrack(long guildId) {
+    prefetchExecutor.submit(() -> {
+      try {
+        TrackQueue queue = getOrCreateQueue(guildId);
+        List<AudioTrack> upcomingTracks = queue.getTracks();
+        
+        if (!upcomingTracks.isEmpty()) {
+          AudioTrack nextTrack = upcomingTracks.get(0);
+          // For Lavaplayer, tracks are already loaded, but we could trigger buffering here
+          logger.debug("Prefetched next track for guild {}: {}", guildId, nextTrack.getTitle());
+        }
+      } catch (Exception e) {
+        logger.warn("Failed to prefetch next track for guild {}", guildId, e);
+      }
+    });
+  }
+
   private void startPlayback(long guildId, AudioTrack track) {
     playbackStrategy.startPlayback(guildId, track);
+    metrics.recordTrackPlayed();
     logger.info("Started playback for guild {}: {}", guildId, track.getTitle());
   }
 

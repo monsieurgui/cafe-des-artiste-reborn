@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,9 @@ public class LavaplayerPlaybackStrategy extends AudioEventAdapter implements Pla
   
   private final AudioPlayerManager playerManager;
   private final ConcurrentMap<Long, AudioPlayer> guildPlayers = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Long, LavaplayerAudioSendHandler> guildSendHandlers = new ConcurrentHashMap<>();
   private AudioController audioController;
+  private JDA jda;
 
   @Inject
   public LavaplayerPlaybackStrategy(LavaplayerSearchService searchService) {
@@ -32,6 +37,10 @@ public class LavaplayerPlaybackStrategy extends AudioEventAdapter implements Pla
 
   public void setAudioController(AudioController audioController) {
     this.audioController = audioController;
+  }
+
+  public void setJDA(JDA jda) {
+    this.jda = jda;
   }
 
   @Override
@@ -117,7 +126,25 @@ public class LavaplayerPlaybackStrategy extends AudioEventAdapter implements Pla
     return guildPlayers.computeIfAbsent(guildId, k -> {
       AudioPlayer player = playerManager.createPlayer();
       player.addListener(this);
+      
+      // Create and set audio send handler
+      LavaplayerAudioSendHandler sendHandler = new LavaplayerAudioSendHandler(player);
+      guildSendHandlers.put(guildId, sendHandler);
+      
+      // Set the audio send handler on the guild's audio manager
+      if (jda != null) {
+        Guild guild = jda.getGuildById(guildId);
+        if (guild != null) {
+          AudioManager audioManager = guild.getAudioManager();
+          audioManager.setSendingHandler(sendHandler);
+        }
+      }
+      
       return player;
     });
+  }
+
+  public LavaplayerAudioSendHandler getSendHandler(long guildId) {
+    return guildSendHandlers.get(guildId);
   }
 }

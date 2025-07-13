@@ -1,11 +1,14 @@
 package dev.cafe.bot;
 
 import dev.cafe.core.AudioController;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +27,8 @@ public class AudioCommands extends ListenerAdapter {
   @Override
   public void onReady(ReadyEvent event) {
     event.getJDA().updateCommands().addCommands(
+        Commands.slash("join", "Join your voice channel"),
+        Commands.slash("leave", "Leave the voice channel"),
         Commands.slash("play", "Play a song from YouTube or URL")
             .addOption(OptionType.STRING, "query", "Song name or URL", true),
         Commands.slash("skip", "Skip the current song"),
@@ -46,6 +51,12 @@ public class AudioCommands extends ListenerAdapter {
     long guildId = event.getGuild().getIdLong();
     
     switch (event.getName()) {
+      case "join":
+        handleJoin(event, guildId);
+        break;
+      case "leave":
+        handleLeave(event, guildId);
+        break;
       case "play":
         handlePlay(event, guildId);
         break;
@@ -106,6 +117,32 @@ public class AudioCommands extends ListenerAdapter {
   private void handleQueue(SlashCommandInteractionEvent event, long guildId) {
     String result = audioController.getQueueInfo(guildId);
     event.reply(result).queue();
+  }
+
+  private void handleJoin(SlashCommandInteractionEvent event, long guildId) {
+    Member member = event.getMember();
+    if (member == null || member.getVoiceState() == null || !member.getVoiceState().inAudioChannel()) {
+      event.reply("You need to be in a voice channel!").setEphemeral(true).queue();
+      return;
+    }
+
+    AudioChannel voiceChannel = member.getVoiceState().getChannel();
+    AudioManager audioManager = event.getGuild().getAudioManager();
+    
+    audioManager.openAudioConnection(voiceChannel);
+    event.reply("Joined " + voiceChannel.getName()).queue();
+  }
+
+  private void handleLeave(SlashCommandInteractionEvent event, long guildId) {
+    AudioManager audioManager = event.getGuild().getAudioManager();
+    
+    if (!audioManager.isConnected()) {
+      event.reply("I'm not connected to a voice channel!").setEphemeral(true).queue();
+      return;
+    }
+    
+    audioManager.closeAudioConnection();
+    event.reply("Left the voice channel").queue();
   }
 
   private void handlePing(SlashCommandInteractionEvent event) {
