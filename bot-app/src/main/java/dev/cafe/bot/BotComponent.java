@@ -3,6 +3,7 @@ package dev.cafe.bot;
 import dagger.Component;
 import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.core.AudioController;
+import dev.cafe.core.PlaylistManager;
 import javax.inject.Singleton;
 
 /**
@@ -13,4 +14,5 @@ import javax.inject.Singleton;
 public interface BotComponent {
   AudioController audioController();
   PlaybackStrategy playbackStrategy();
+  PlaylistManager playlistManager();
 }

@@ -47,6 +47,22 @@ public class AudioController {
         .thenApply(result -> handleSearchResult(guildId, result));
   }
 
+  public CompletableFuture<SearchResult> searchOnly(String query) {
+    return searchService.search(query);
+  }
+
+  public String playSelectedTrack(long guildId, dev.cafe.audio.AudioTrack track) {
+    TrackQueue queue = getOrCreateQueue(guildId);
+    
+    if (!playbackStrategy.isPlaying(guildId)) {
+      startPlayback(guildId, track);
+      return "Now playing: " + track.getTitle();
+    } else {
+      queue.add(track);
+      return "Added to queue: " + track.getTitle();
+    }
+  }
+
   private String handleSearchResult(long guildId, SearchResult result) {
     TrackQueue queue = getOrCreateQueue(guildId);
     

@@ -15,3 +15,7 @@
 • 2025-01-13: GitHub Actions CI/CD pipeline created with testing, Docker build/push to GHCR, security scanning with Trivy, and automated deployments.
 • 2025-01-13: Enhanced health endpoint with JSON response including JDA shard status, gateway ping, guild count, and Lavalink connectivity monitoring.
 • 2025-01-13: Docker Compose updated with Lavalink 4.0.7 service, health checks, dependency management, and Prometheus scraping configuration.
+• 2025-01-13: Enhanced /play command with interactive search results selection using Discord buttons, showing up to 5 tracks with duration and metadata.
+• 2025-01-13: Implemented /search command for browsing tracks without immediate playback, featuring rich embeds with track information and selection buttons.
+• 2025-01-13: Created comprehensive playlist management system with Playlist data model, PlaylistManager service, and /playlist commands (create, list, load, show).
+• 2025-01-13: Added playlist functionality with in-memory storage, track management, user ownership, and queue integration for loading playlists into audio playback.

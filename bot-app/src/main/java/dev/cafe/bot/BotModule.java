@@ -10,6 +10,7 @@ import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
+import dev.cafe.core.PlaylistManager;
 import dev.cafe.core.VoiceManager;
 import dev.cafe.metrics.MetricsBinder;
 import javax.inject.Singleton;
@@ -60,6 +61,12 @@ public class BotModule {
   @Singleton
   MetricsBinder provideMetricsBinder() {
     return new MetricsBinder();
+  }
+
+  @Provides
+  @Singleton
+  PlaylistManager providePlaylistManager() {
+    return new PlaylistManager();
   }
 
   @Provides
