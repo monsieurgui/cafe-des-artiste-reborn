@@ -20,5 +20,5 @@
 | # | Commit | Description |
 |---|--------|-------------|
 | C1 | bb6e66c | **feat(cache): create MostPlayedService (SQLite)** |
-| C2 | pending-commit | **feat(cache): download track to `cache/` when playCount ≥ 5** |
+| C2 | 765518e | **feat(cache): download track to `cache/` when playCount ≥ 5** |
 
