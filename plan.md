@@ -20,5 +20,5 @@
 
 | # | Commit | Description |
 |---|--------|-------------|
-| C1 | pending-commit | **feat(cache): create MostPlayedService (SQLite)** |
+| C1 | bb6e66c | **feat(cache): create MostPlayedService (SQLite)** |
 
