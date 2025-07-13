@@ -11,6 +11,10 @@ public class ConfigLoader {
     this.config = ConfigFactory.load();
   }
 
+  public Config getConfig() {
+    return config;
+  }
+
   public String getDiscordToken() {
     return config.getString("discord.token");
   }

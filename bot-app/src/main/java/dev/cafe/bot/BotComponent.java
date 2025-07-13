@@ -4,6 +4,7 @@ import dagger.Component;
 import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.cache.dagger.CacheBindsModule;
 import dev.cafe.cache.dagger.CacheModule;
+import dev.cafe.cache.guild.GuildSettingsRepository;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
 import javax.inject.Singleton;
@@ -19,4 +20,6 @@ public interface BotComponent {
   PlaylistManager playlistManager();
 
   CacheCommands cacheCommands();
+
+  GuildSettingsRepository guildSettingsRepository();
 }

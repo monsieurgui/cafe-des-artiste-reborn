@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.cafe.cache.guild.SqliteGuildSettingsRepositoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-07-13T02:30:54.072Z" hostname="Mac" time="0.481">
+  <properties/>
+  <testcase name="saveAndFindById_whenExists_updatesAndRetrieves()" classname="dev.cafe.cache.guild.SqliteGuildSettingsRepositoryTest" time="0.475"/>
+  <testcase name="saveAndFindById_whenNew_insertsAndRetrieves()" classname="dev.cafe.cache.guild.SqliteGuildSettingsRepositoryTest" time="0.003"/>
+  <testcase name="findById_whenNotExists_returnsEmpty()" classname="dev.cafe.cache.guild.SqliteGuildSettingsRepositoryTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

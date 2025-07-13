@@ -4,11 +4,17 @@ import dagger.Binds;
 import dagger.Module;
 import dev.cafe.audio.PlaybackStrategy;
 import dev.cafe.cache.FileCachePlaybackStrategy;
+import dev.cafe.cache.guild.GuildSettingsRepository;
+import dev.cafe.cache.guild.SqliteGuildSettingsRepository;
 
 @Module
-<span class="nc" id="L9">public abstract class CacheBindsModule {</span>
+<span class="nc" id="L11">public abstract class CacheBindsModule {</span>
 
   @Binds
   abstract PlaybackStrategy bindPlaybackStrategy(FileCachePlaybackStrategy strategy);
+
+  @Binds
+  abstract GuildSettingsRepository bindGuildSettingsRepository(
+      SqliteGuildSettingsRepository repository);
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

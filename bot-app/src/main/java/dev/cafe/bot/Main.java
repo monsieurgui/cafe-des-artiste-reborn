@@ -1,6 +1,7 @@
 package dev.cafe.bot;
 
 import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
+import dev.cafe.cache.guild.GuildSettingsRepository;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
 import net.dv8tion.jda.api.JDA;
@@ -23,6 +24,11 @@ public class Main {
 
       // Initialize dependency injection
       BotComponent component = DaggerBotComponent.create();
+
+      // Initialize database tables
+      GuildSettingsRepository guildSettingsRepository = component.guildSettingsRepository();
+      guildSettingsRepository.createTable();
+
       AudioController audioController = component.audioController();
       PlaylistManager playlistManager = component.playlistManager();
       CacheCommands cacheCommands = component.cacheCommands();

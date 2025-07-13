@@ -1,36 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CacheModule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">infra-cache</a> &gt; <a href="index.source.html" class="el_package">dev.cafe.cache.dagger</a> &gt; <span class="el_source">CacheModule.java</span></div><h1>CacheModule.java</h1><pre class="source lang-java linenums">package dev.cafe.cache.dagger;
 
+import com.typesafe.config.Config;
 import dagger.Module;
 import dagger.Provides;
 import dev.cafe.cache.MostPlayedService;
 import dev.cafe.cache.TrackCacheService;
+import dev.cafe.config.ConfigLoader;
 import java.sql.SQLException;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.SQLiteDataSource;
 
 @Module
-<span class="nc" id="L13">public class CacheModule {</span>
-<span class="nc" id="L14">  private static final Logger logger = LoggerFactory.getLogger(CacheModule.class);</span>
-  private static final String DATABASE_PATH = &quot;cache.db&quot;;
+<span class="nc" id="L18">public class CacheModule {</span>
+<span class="nc" id="L19">  private static final Logger LOGGER = LoggerFactory.getLogger(CacheModule.class);</span>
+
+  @Provides
+  @Singleton
+  @Named(&quot;databaseUrl&quot;)
+  String provideDatabaseUrl(ConfigLoader configLoader) {
+<span class="nc" id="L25">    Config config = configLoader.getConfig();</span>
+<span class="nc bnc" id="L26" title="All 2 branches missed.">    if (config.hasPath(&quot;database.path&quot;)) {</span>
+<span class="nc" id="L27">      return &quot;jdbc:sqlite:&quot; + config.getString(&quot;database.path&quot;);</span>
+    }
+    // Default to a file in the current working directory
+<span class="nc" id="L30">    return &quot;jdbc:sqlite:cafe-bot.db&quot;;</span>
+  }
+
+  @Provides
+  @Singleton
+  DataSource provideDataSource(@Named(&quot;databaseUrl&quot;) String databaseUrl) {
+<span class="nc" id="L36">    LOGGER.info(&quot;Initializing database at {}&quot;, databaseUrl);</span>
+<span class="nc" id="L37">    SQLiteDataSource dataSource = new SQLiteDataSource();</span>
+<span class="nc" id="L38">    dataSource.setUrl(databaseUrl);</span>
+<span class="nc" id="L39">    return dataSource;</span>
+  }
 
   @Provides
   @Singleton
   MostPlayedService provideMostPlayedService() {
+    // This service seems to use its own persistence, leaving as is.
     try {
-<span class="nc" id="L21">      return new MostPlayedService(DATABASE_PATH);</span>
-<span class="nc" id="L22">    } catch (SQLException e) {</span>
-<span class="nc" id="L23">      logger.error(&quot;Failed to initialize MostPlayedService&quot;, e);</span>
+<span class="nc" id="L47">      return new MostPlayedService(&quot;cache.db&quot;);</span>
+<span class="nc" id="L48">    } catch (SQLException e) {</span>
+<span class="nc" id="L49">      LOGGER.error(&quot;Failed to initialize MostPlayedService&quot;, e);</span>
       // Allow the app to start, but caching will not work.
       // A more robust solution might be to prevent startup.
-<span class="nc" id="L26">      return null;</span>
+<span class="nc" id="L52">      return null;</span>
     }
   }
 
   @Provides
   @Singleton
   TrackCacheService provideTrackCacheService() {
-<span class="nc" id="L33">    return new TrackCacheService();</span>
+<span class="nc" id="L59">    return new TrackCacheService();</span>
   }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
