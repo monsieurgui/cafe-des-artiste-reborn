@@ -91,4 +91,11 @@ public class BotModule {
 
     return controller;
   }
+
+  @Provides
+  @Singleton
+  CacheCommands provideCacheCommands(
+      MostPlayedService mostPlayedService, TrackCacheService trackCacheService) {
+    return new CacheCommands(mostPlayedService, trackCacheService);
+  }
 }

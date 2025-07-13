@@ -39,4 +39,25 @@ public class TrackCacheService {
   public File getCacheFile(String videoId) {
     return new File(CACHE_DIR, videoId + ".opus");
   }
+
+  /**
+   * Clears the entire file cache.
+   *
+   * @return the number of files deleted.
+   */
+  public int clearCache() {
+    if (!CACHE_DIR.exists()) {
+      return 0;
+    }
+    int count = 0;
+    for (File file : CACHE_DIR.listFiles()) {
+      if (file.delete()) {
+        count++;
+      } else {
+        logger.warn("Failed to delete cache file: {}", file.getName());
+      }
+    }
+    logger.info("Cleared {} files from cache.", count);
+    return count;
+  }
 }

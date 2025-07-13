@@ -92,6 +92,8 @@ public final class DaggerBotComponent {
 
     private Provider<PlaylistManager> providePlaylistManagerProvider;
 
+    private Provider<CacheCommands> provideCacheCommandsProvider;
+
     private BotComponentImpl(BotModule botModuleParam, CacheModule cacheModuleParam) {
 
       initialize(botModuleParam, cacheModuleParam);
@@ -109,6 +111,7 @@ public final class DaggerBotComponent {
       this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
       this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, ((Provider) fileCachePlaybackStrategyProvider), provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
       this.providePlaylistManagerProvider = DoubleCheck.provider(BotModule_ProvidePlaylistManagerFactory.create(botModuleParam));
+      this.provideCacheCommandsProvider = DoubleCheck.provider(BotModule_ProvideCacheCommandsFactory.create(botModuleParam, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
     }
 
     @Override
@@ -124,6 +127,11 @@ public final class DaggerBotComponent {
     @Override
     public PlaylistManager playlistManager() {
       return providePlaylistManagerProvider.get();
+    }
+
+    @Override
+    public CacheCommands cacheCommands() {
+      return provideCacheCommandsProvider.get();
     }
   }
 }

@@ -17,4 +17,6 @@ public interface BotComponent {
   PlaybackStrategy playbackStrategy();
 
   PlaylistManager playlistManager();
+
+  CacheCommands cacheCommands();
 }

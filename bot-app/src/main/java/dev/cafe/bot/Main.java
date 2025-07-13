@@ -25,11 +25,12 @@ public class Main {
       BotComponent component = DaggerBotComponent.create();
       AudioController audioController = component.audioController();
       PlaylistManager playlistManager = component.playlistManager();
+      CacheCommands cacheCommands = component.cacheCommands();
 
       JDA jda =
           JDABuilder.createDefault(token)
               .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
-              .addEventListeners(new AudioCommands(audioController, playlistManager))
+              .addEventListeners(new AudioCommands(audioController, playlistManager), cacheCommands)
               .build();
 
       // Set JDA on playback strategy after JDA is built
