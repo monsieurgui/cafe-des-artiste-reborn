@@ -120,9 +120,21 @@ public class MostPlayedService implements AutoCloseable {
    * @throws SQLException if a database access error occurs.
    */
   public void setCached(String videoId) throws SQLException {
-    String sql = "UPDATE play_counts SET cached = TRUE WHERE videoId = ?";
+    setCached(videoId, true);
+  }
+
+  /**
+   * Sets the cached status of a track.
+   *
+   * @param videoId the ID of the video.
+   * @param cached the cached status.
+   * @throws SQLException if a database access error occurs.
+   */
+  public void setCached(String videoId, boolean cached) throws SQLException {
+    String sql = "UPDATE play_counts SET cached = ? WHERE videoId = ?";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-      pstmt.setString(1, videoId);
+      pstmt.setBoolean(1, cached);
+      pstmt.setString(2, videoId);
       pstmt.executeUpdate();
     }
   }

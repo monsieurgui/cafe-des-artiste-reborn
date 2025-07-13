@@ -10,6 +10,7 @@ import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
 import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
 import dev.cafe.cache.MostPlayedService;
 import dev.cafe.cache.TrackCacheService;
+import dev.cafe.cache.dagger.Streaming;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
@@ -41,7 +42,9 @@ public class BotModule {
 
   @Provides
   @Singleton
-  PlaybackStrategy providePlaybackStrategy(ConfigLoader config, AudioSearchService searchService) {
+  @Streaming
+  PlaybackStrategy provideStreamingPlaybackStrategy(
+      ConfigLoader config, AudioSearchService searchService) {
     String backend = config.getAudioBackend();
     if ("lavalink".equals(backend)) {
       return new LavalinkPlaybackStrategy(

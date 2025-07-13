@@ -1,6 +1,6 @@
 # plan.md
 > Only the **Todo** list is read/executed by Claude.  
-> After completing a task, move it to **Done** with the commit hash.
+> After completing a a task, move it to **Done** with the commit hash.
 
 
 
@@ -8,7 +8,6 @@
 
 | # | Task | Acceptance criteria |
 |---|------|---------------------|
-| C3 | **feat(cache): FileCachePlaybackStrategy** | If cached file exists → play local; else stream; on missing/corrupt file auto-streams and flags stale. |
 | C4 | **feat(cache): `/cache stats` & `/cache clear` commands** | Stats embed shows top 10 cached; clear deletes files & DB flags. |
 | C5 | **chore(ci): nightly GitHub Action to prune cache (>60 days OR >10 GB)** | Job logs deleted MBs; preserves metrics. |
 
@@ -21,4 +20,5 @@
 |---|--------|-------------|
 | C1 | bb6e66c | **feat(cache): create MostPlayedService (SQLite)** |
 | C2 | 765518e | **feat(cache): download track to `cache/` when playCount ≥ 5** |
+| C3 | pending-commit | **feat(cache): FileCachePlaybackStrategy** |
 

@@ -5,6 +5,8 @@ import dagger.internal.DoubleCheck;
 import dagger.internal.Preconditions;
 import dev.cafe.audio.AudioSearchService;
 import dev.cafe.audio.PlaybackStrategy;
+import dev.cafe.cache.FileCachePlaybackStrategy;
+import dev.cafe.cache.FileCachePlaybackStrategy_Factory;
 import dev.cafe.cache.MostPlayedService;
 import dev.cafe.cache.TrackCacheService;
 import dev.cafe.cache.dagger.CacheModule;
@@ -76,13 +78,15 @@ public final class DaggerBotComponent {
 
     private Provider<AudioSearchService> provideAudioSearchServiceProvider;
 
-    private Provider<PlaybackStrategy> providePlaybackStrategyProvider;
-
-    private Provider<MetricsBinder> provideMetricsBinderProvider;
+    private Provider<PlaybackStrategy> provideStreamingPlaybackStrategyProvider;
 
     private Provider<MostPlayedService> provideMostPlayedServiceProvider;
 
     private Provider<TrackCacheService> provideTrackCacheServiceProvider;
+
+    private Provider<FileCachePlaybackStrategy> fileCachePlaybackStrategyProvider;
+
+    private Provider<MetricsBinder> provideMetricsBinderProvider;
 
     private Provider<AudioController> provideAudioControllerProvider;
 
@@ -98,11 +102,12 @@ public final class DaggerBotComponent {
     private void initialize(final BotModule botModuleParam, final CacheModule cacheModuleParam) {
       this.provideConfigLoaderProvider = DoubleCheck.provider(BotModule_ProvideConfigLoaderFactory.create(botModuleParam));
       this.provideAudioSearchServiceProvider = DoubleCheck.provider(BotModule_ProvideAudioSearchServiceFactory.create(botModuleParam, provideConfigLoaderProvider));
-      this.providePlaybackStrategyProvider = DoubleCheck.provider(BotModule_ProvidePlaybackStrategyFactory.create(botModuleParam, provideConfigLoaderProvider, provideAudioSearchServiceProvider));
-      this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
+      this.provideStreamingPlaybackStrategyProvider = DoubleCheck.provider(BotModule_ProvideStreamingPlaybackStrategyFactory.create(botModuleParam, provideConfigLoaderProvider, provideAudioSearchServiceProvider));
       this.provideMostPlayedServiceProvider = DoubleCheck.provider(CacheModule_ProvideMostPlayedServiceFactory.create(cacheModuleParam));
       this.provideTrackCacheServiceProvider = DoubleCheck.provider(CacheModule_ProvideTrackCacheServiceFactory.create(cacheModuleParam));
-      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, providePlaybackStrategyProvider, provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
+      this.fileCachePlaybackStrategyProvider = DoubleCheck.provider(FileCachePlaybackStrategy_Factory.create(provideStreamingPlaybackStrategyProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
+      this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
+      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, ((Provider) fileCachePlaybackStrategyProvider), provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
       this.providePlaylistManagerProvider = DoubleCheck.provider(BotModule_ProvidePlaylistManagerFactory.create(botModuleParam));
     }
 
@@ -113,7 +118,7 @@ public final class DaggerBotComponent {
 
     @Override
     public PlaybackStrategy playbackStrategy() {
-      return providePlaybackStrategyProvider.get();
+      return fileCachePlaybackStrategyProvider.get();
     }
 
     @Override
