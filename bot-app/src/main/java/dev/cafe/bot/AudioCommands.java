@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -45,12 +46,16 @@ public class AudioCommands extends ListenerAdapter {
         .updateCommands()
         .addCommands(
             Commands.slash("leave", "Leave the voice channel"),
-            Commands.slash("play", "Play a song from YouTube or URL")
-                .addOption(OptionType.STRING, "query", "Song name or URL", true)
-                .addOption(
-                    OptionType.BOOLEAN, "search", "Show search results to choose from", false),
-            Commands.slash("search", "Search for tracks without playing")
-                .addOption(OptionType.STRING, "query", "Song name to search for", true),
+            Commands.slash("play", "Play audio")
+                .addSubcommands(
+                    new SubcommandData("url", "Play a single song from a URL")
+                        .addOption(OptionType.STRING, "url", "The URL of the song", true),
+                    new SubcommandData("playlist", "Play a playlist from a URL")
+                        .addOption(OptionType.STRING, "url", "The URL of the playlist", true),
+                    new SubcommandData("search", "Search for a song and pick from the results")
+                        .addOption(OptionType.STRING, "query", "The search query", true)),
+            Commands.slash("p", "Play a song, playlist, or search for a song")
+                .addOption(OptionType.STRING, "query", "URL or search term", true, false),
             Commands.slash("playlist", "Manage playlists")
                 .addOption(OptionType.STRING, "action", "Action to perform", true)
                 .addOption(OptionType.STRING, "name", "Playlist name", false)
@@ -76,11 +81,11 @@ public class AudioCommands extends ListenerAdapter {
       case "leave":
         handleLeave(event, guildId);
         break;
+      case "p":
+        handleP(event, guildId);
+        break;
       case "play":
         handlePlay(event, guildId);
-        break;
-      case "search":
-        handleSearch(event, guildId);
         break;
       case "playlist":
         handlePlaylist(event, guildId);
@@ -100,43 +105,23 @@ public class AudioCommands extends ListenerAdapter {
     }
   }
 
-  private void handlePlay(SlashCommandInteractionEvent event, long guildId) {
-    // Auto-join user's voice channel if not connected
-    if (!ensureVoiceConnection(event)) {
-      event.reply("You need to be in a voice channel!").setEphemeral(true).queue();
-      return;
-    }
-
+  private void handleP(SlashCommandInteractionEvent event, long guildId) {
     String query = event.getOption("query").getAsString();
-    boolean showSearch =
-        event.getOption("search") != null && event.getOption("search").getAsBoolean();
+
+    // Simple URL check. This can be improved, but for now, it's a good heuristic.
+    boolean isUrl = query.startsWith("http://") || query.startsWith("https://");
+
+    if (isUrl) {
+      if (!ensureVoiceConnection(event)) {
+        event.reply("You need to be in a voice channel to play music!").setEphemeral(true).queue();
+        return;
+      }
+    }
 
     event.deferReply().queue();
 
-    if (showSearch && !query.startsWith("http")) {
-      // Show search results for user selection
-      audioController
-          .searchOnly(query)
-          .thenAccept(
-              result -> {
-                if (result.getType() == dev.cafe.audio.SearchResult.Type.SEARCH_RESULT
-                    && !result.getTracks().isEmpty()) {
-                  showSearchResults(event, result, guildId);
-                } else {
-                  // Fallback to direct play
-                  audioController
-                      .play(guildId, query)
-                      .thenAccept(playResult -> event.getHook().editOriginal(playResult).queue());
-                }
-              })
-          .exceptionally(
-              throwable -> {
-                logger.error("Error searching tracks", throwable);
-                event.getHook().editOriginal("Error searching: " + throwable.getMessage()).queue();
-                return null;
-              });
-    } else {
-      // Direct play
+    if (isUrl) {
+      // Direct play (handles song or playlist URLs)
       audioController
           .play(guildId, query)
           .thenAccept(result -> event.getHook().editOriginal(result).queue())
@@ -149,22 +134,70 @@ public class AudioCommands extends ListenerAdapter {
                     .queue();
                 return null;
               });
+    } else {
+      // Search
+      audioController
+          .searchOnly(query)
+          .thenAccept(result -> showSearchResults(event, result, guildId))
+          .exceptionally(
+              throwable -> {
+                logger.error("Error searching tracks", throwable);
+                event.getHook().editOriginal("Error searching: " + throwable.getMessage()).queue();
+                return null;
+              });
     }
   }
 
-  private void handleSearch(SlashCommandInteractionEvent event, long guildId) {
-    String query = event.getOption("query").getAsString();
+  private void handlePlay(SlashCommandInteractionEvent event, long guildId) {
+    String subcommand = event.getSubcommandName();
+    if (subcommand == null) {
+      event.reply("Invalid command structure.").setEphemeral(true).queue();
+      return;
+    }
+
+    // Auto-join user's voice channel if not connected
+    if (!subcommand.equals("search") && !ensureVoiceConnection(event)) {
+      event.reply("You need to be in a voice channel!").setEphemeral(true).queue();
+      return;
+    }
+
     event.deferReply().queue();
 
-    audioController
-        .searchOnly(query)
-        .thenAccept(result -> showSearchResults(event, result, guildId))
-        .exceptionally(
-            throwable -> {
-              logger.error("Error searching tracks", throwable);
-              event.getHook().editOriginal("Error searching: " + throwable.getMessage()).queue();
-              return null;
-            });
+    switch (subcommand) {
+      case "url":
+      case "playlist":
+        String url = event.getOption("url").getAsString();
+        // Direct play
+        audioController
+            .play(guildId, url)
+            .thenAccept(result -> event.getHook().editOriginal(result).queue())
+            .exceptionally(
+                throwable -> {
+                  logger.error("Error playing track", throwable);
+                  event
+                      .getHook()
+                      .editOriginal("Error playing track: " + throwable.getMessage())
+                      .queue();
+                  return null;
+                });
+        break;
+
+      case "search":
+        String query = event.getOption("query").getAsString();
+        audioController
+            .searchOnly(query)
+            .thenAccept(result -> showSearchResults(event, result, guildId))
+            .exceptionally(
+                throwable -> {
+                  logger.error("Error searching tracks", throwable);
+                  event
+                      .getHook()
+                      .editOriginal("Error searching: " + throwable.getMessage())
+                      .queue();
+                  return null;
+                });
+        break;
+    }
   }
 
   private void handlePlaylist(SlashCommandInteractionEvent event, long guildId) {

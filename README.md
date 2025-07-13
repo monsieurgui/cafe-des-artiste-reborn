@@ -119,8 +119,10 @@ audio {
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `/play` | Play a song or add to queue | `query`: Song name or URL<br>`search`: Show search results (optional) |
-| `/search` | Search for tracks | `query`: Song name |
+| `/p` | Play from a URL or search. | `query`: Song/playlist URL or search term. |
+| `/play song` | Play a single song from a URL. | `url`: The URL of the song. |
+| `/play search` | Search for a song and pick from results. | `query`: The search query. |
+| `/play playlist play` | Play a playlist from a URL. | `url`: The URL of the playlist. |
 | `/skip` | Skip current song | None |
 | `/stop` | Stop and clear queue | None |
 | `/queue` | Show current queue | None |
@@ -131,11 +133,14 @@ audio {
 |---------|-------------|
 | `/leave` | Leave voice channel |
 
-### Playlists
+### Playlist Management
 
 | Command | Description | Parameters |
 |---------|-------------|------------|
-| `/playlist` | Manage playlists | `action`: `create`, `list`, `load`, `show`<br>`name`: (for `create`)<br>`id`: (for `load`, `show`) |
+| `/play playlist create` | Create a new playlist. | `name`: The name for the new playlist. |
+| `/play playlist list` | List your saved playlists. | None |
+| `/play playlist load` | Load a saved playlist into the queue. | `id`: The ID of the playlist. |
+| `/play playlist show` | Show tracks in a saved playlist. | `id`: The ID of the playlist. |
 
 ### Utility
 
@@ -147,20 +152,19 @@ audio {
 
 ### Basic Playback
 ```
-/play Rick Astley        # Bot auto-joins and plays "Rick Astley"
-/play query:https://youtube.com/watch?v=... # Direct URL playback
-/play query:Beethoven search:true  # Shows search results to choose from
-/queue                   # View current queue
-/skip                    # Skip to next song
-/stop                    # Stop playback and clear the queue
+/p query:Never Gonna Give You Up
+/p query:https://www.youtube.com/watch?v=dQw4w9WgXcQ
+/queue
+/skip
+/stop
 ```
 
 ### Playlist Management
 ```
-/playlist action:create name:My Favorites  # Create a new playlist
-/playlist action:list                      # View your playlists
-/playlist action:load id:550e8400-e29b-...   # Load a playlist into the queue
-/playlist action:show id:550e8400-e29b-...   # Show tracks in a playlist
+/play playlist create name:My Favorites
+/play playlist list
+/play playlist load id:your-playlist-id
+/play playlist show id:your-playlist-id
 ```
 
 ### Supported Sources
