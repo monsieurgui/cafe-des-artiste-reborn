@@ -1,6 +1,7 @@
 package dev.cafe.bot;
 
 import dev.cafe.config.ConfigLoader;
+import dev.cafe.core.AudioController;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,9 +22,13 @@ public class Main {
         System.exit(1);
       }
 
+      // Initialize dependency injection
+      BotComponent component = DaggerBotComponent.create();
+      AudioController audioController = component.audioController();
+
       JDA jda = JDABuilder.createDefault(token)
           .enableIntents(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
-          .addEventListeners(new PingCommand())
+          .addEventListeners(new AudioCommands(audioController))
           .build();
 
       jda.awaitReady();
