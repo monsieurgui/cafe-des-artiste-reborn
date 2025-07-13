@@ -1,0 +1,1 @@
+// Interface definitions only - no external dependencies beyond what's in parent
