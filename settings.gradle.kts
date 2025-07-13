@@ -7,5 +7,6 @@ include(
   "audio-lavaplayer",
   "audio-lavalink",
   "infra-config",
-  "infra-metrics"
+  "infra-metrics",
+  "infra-cache"
 )

@@ -19,3 +19,4 @@
 • 2025-01-13: Implemented /search command for browsing tracks without immediate playback, featuring rich embeds with track information and selection buttons.
 • 2025-01-13: Created comprehensive playlist management system with Playlist data model, PlaylistManager service, and /playlist commands (create, list, load, show).
 • 2025-01-13: Added playlist functionality with in-memory storage, track management, user ownership, and queue integration for loading playlists into audio playback.
+• 2025-01-14: Added `org.xerial:sqlite-jdbc:3.45.1.0` dependency for `infra-cache` module to support caching features (C1).

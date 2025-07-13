@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.cafe.cache.MostPlayedServiceTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2025-07-13T02:11:53.321Z" hostname="Mac" time="0.448">
+  <properties/>
+  <testcase name="incrementPlayCount_forExistingVideo_incrementsCount()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.44"/>
+  <testcase name="serviceClosed_throwsException()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.003"/>
+  <testcase name="getPlayCount_forNewVideo_returnsZero()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
+  <testcase name="incrementPlayCount_forNewVideo_setsCountToOne()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
+  <testcase name="getPlayCount_withMultipleVideos()" classname="dev.cafe.cache.MostPlayedServiceTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>
