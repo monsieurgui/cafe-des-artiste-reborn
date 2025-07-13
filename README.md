@@ -133,6 +133,20 @@ audio {
 |---------|-------------|
 | `/leave` | Leave voice channel |
 
+### Setup
+
+| Command | Description |
+|---------|-------------|
+| `/setup`  | Configure the bot for the server. |
+
+The `/setup` command starts a DM conversation to link the bot to a specific channel for its queue and now-playing messages. This command requires `Administrator` permissions.
+
+Once a channel is linked, the bot will post two messages that it will keep updated:
+1.  A **Queue** message, showing the list of upcoming tracks.
+2.  A **Now Playing** message with a progress bar for the current song.
+
+These messages are pinned for easy access.
+
 ### Playlist Management
 
 | Command | Description | Parameters |
@@ -147,6 +161,17 @@ audio {
 | Command | Description |
 |---------|-------------|
 | `/ping` | Check bot responsiveness |
+
+### Permissions
+
+For the bot to function correctly, it needs the following permissions in the server and the linked channel:
+- `Send Messages`
+- `Manage Messages`
+- `Embed Links`
+- `Attach Files`
+- `Read Message History`
+- `Connect`
+- `Speak`
 
 ## 🎯 Usage Examples
 
