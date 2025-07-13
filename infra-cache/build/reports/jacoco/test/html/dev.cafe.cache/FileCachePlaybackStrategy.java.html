@@ -84,5 +84,15 @@ public class FileCachePlaybackStrategy implements PlaybackStrategy {
   public boolean isPaused(long guildId) {
 <span class="nc" id="L85">    return streamingStrategy.isPaused(guildId);</span>
   }
+
+  @Override
+  public AudioTrack getCurrentTrack(long guildId) {
+<span class="nc" id="L90">    return streamingStrategy.getCurrentTrack(guildId);</span>
+  }
+
+  @Override
+  public long getPosition(long guildId) {
+<span class="nc" id="L95">    return streamingStrategy.getPosition(guildId);</span>
+  }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

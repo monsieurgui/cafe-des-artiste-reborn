@@ -31,6 +31,7 @@ public class AudioController {
   private final MetricsBinder metrics;
   private final MostPlayedService mostPlayedService;
   private final TrackCacheService trackCacheService;
+  private final Optional<QueueChangeListener> queueChangeListener;
   private final ConcurrentMap<Long, TrackQueue> guildQueues = new ConcurrentHashMap<>();
   private final ScheduledExecutorService prefetchExecutor = Executors.newScheduledThreadPool(2);
 
@@ -40,12 +41,14 @@ public class AudioController {
       PlaybackStrategy playbackStrategy,
       MetricsBinder metrics,
       MostPlayedService mostPlayedService,
-      TrackCacheService trackCacheService) {
+      TrackCacheService trackCacheService,
+      Optional<QueueChangeListener> queueChangeListener) {
     this.searchService = searchService;
     this.playbackStrategy = playbackStrategy;
     this.metrics = metrics;
     this.mostPlayedService = mostPlayedService;
     this.trackCacheService = trackCacheService;
+    this.queueChangeListener = queueChangeListener;
   }
 
   public CompletableFuture<String> play(long guildId, String query) {
@@ -61,20 +64,16 @@ public class AudioController {
   }
 
   public String playSelectedTrack(long guildId, dev.cafe.audio.AudioTrack track) {
-    TrackQueue queue = getOrCreateQueue(guildId);
-
     if (!playbackStrategy.isPlaying(guildId)) {
       startPlayback(guildId, track);
       return "Now playing: " + track.getTitle();
     } else {
-      queue.add(track);
+      addToQueue(guildId, track);
       return "Added to queue: " + track.getTitle();
     }
   }
 
   private String handleSearchResult(long guildId, SearchResult result) {
-    TrackQueue queue = getOrCreateQueue(guildId);
-
     switch (result.getType()) {
       case TRACK_LOADED:
         AudioTrack track = result.getTrack();
@@ -82,7 +81,7 @@ public class AudioController {
           startPlayback(guildId, track);
           return "Now playing: " + track.getTitle();
         } else {
-          queue.add(track);
+          addToQueue(guildId, track);
           return "Added to queue: " + track.getTitle();
         }
 
@@ -95,14 +94,14 @@ public class AudioController {
         AudioTrack firstTrack = tracks.get(0);
         if (!playbackStrategy.isPlaying(guildId)) {
           startPlayback(guildId, firstTrack);
-          tracks.stream().skip(1).forEach(queue::add);
+          tracks.stream().skip(1).forEach(t -> addToQueue(guildId, t));
           return "Playing playlist: "
               + result.getPlaylistName()
               + " ("
               + tracks.size()
               + " tracks)";
         } else {
-          tracks.forEach(queue::add);
+          tracks.forEach(t -> addToQueue(guildId, t));
           return "Added playlist to queue: "
               + result.getPlaylistName()
               + " ("
@@ -121,7 +120,7 @@ public class AudioController {
           startPlayback(guildId, searchTrack);
           return "Now playing: " + searchTrack.getTitle();
         } else {
-          queue.add(searchTrack);
+          addToQueue(guildId, searchTrack);
           return "Added to queue: " + searchTrack.getTitle();
         }
 
@@ -144,7 +143,7 @@ public class AudioController {
       return "Nothing is currently playing";
     }
 
-    Optional<AudioTrack> next = queue.next();
+    Optional<AudioTrack> next = nextTrack(guildId);
     if (next.isPresent()) {
       startPlayback(guildId, next.get());
       return "Skipped to: " + next.get().getTitle();
@@ -155,8 +154,7 @@ public class AudioController {
   }
 
   public String stop(long guildId) {
-    TrackQueue queue = getOrCreateQueue(guildId);
-    queue.clear();
+    clearQueue(guildId);
     playbackStrategy.stopPlayback(guildId);
     return "Playback stopped and queue cleared";
   }
@@ -207,8 +205,7 @@ public class AudioController {
   }
 
   public void onTrackEnd(long guildId) {
-    TrackQueue queue = getOrCreateQueue(guildId);
-    Optional<AudioTrack> next = queue.next();
+    Optional<AudioTrack> next = nextTrack(guildId);
 
     if (next.isPresent()) {
       startPlayback(guildId, next.get());
@@ -244,6 +241,7 @@ public class AudioController {
     metrics.recordTrackPlayed();
     logger.info("Started playback for guild {}: {}", guildId, track.getTitle());
     handleCaching(track);
+    notifyQueueChanged(guildId);
   }
 
   private void handleCaching(AudioTrack track) {
@@ -263,5 +261,27 @@ public class AudioController {
 
   private TrackQueue getOrCreateQueue(long guildId) {
     return guildQueues.computeIfAbsent(guildId, k -> new TrackQueue());
+  }
+
+  private void addToQueue(long guildId, AudioTrack track) {
+    getOrCreateQueue(guildId).add(track);
+    notifyQueueChanged(guildId);
+  }
+
+  private void clearQueue(long guildId) {
+    getOrCreateQueue(guildId).clear();
+    notifyQueueChanged(guildId);
+  }
+
+  private Optional<AudioTrack> nextTrack(long guildId) {
+    TrackQueue queue = getOrCreateQueue(guildId);
+    Optional<AudioTrack> next = queue.next();
+    notifyQueueChanged(guildId);
+    return next;
+  }
+
+  private void notifyQueueChanged(long guildId) {
+    queueChangeListener.ifPresent(
+        listener -> listener.onQueueChanged(guildId, getOrCreateQueue(guildId)));
   }
 }

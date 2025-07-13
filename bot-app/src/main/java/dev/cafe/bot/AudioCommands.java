@@ -118,7 +118,7 @@ public class AudioCommands extends ListenerAdapter {
       }
     }
 
-    event.deferReply().queue();
+    event.deferReply(true).queue();
 
     if (isUrl) {
       // Direct play (handles song or playlist URLs)
@@ -161,7 +161,7 @@ public class AudioCommands extends ListenerAdapter {
       return;
     }
 
-    event.deferReply().queue();
+    event.deferReply(true).queue();
 
     switch (subcommand) {
       case "url":
@@ -265,7 +265,7 @@ public class AudioCommands extends ListenerAdapter {
         }
 
         String result = playlistManager.loadPlaylistToQueue(playlistId, audioController, guildId);
-        event.reply(result).queue();
+        event.reply(result).setEphemeral(true).queue();
         break;
 
       case "show":
@@ -307,7 +307,7 @@ public class AudioCommands extends ListenerAdapter {
                     playlistEmbed.addField("Tracks", trackList.toString(), false);
                   }
 
-                  event.replyEmbeds(playlistEmbed.build()).queue();
+                  event.replyEmbeds(playlistEmbed.build()).setEphemeral(true).queue();
                 },
                 () -> {
                   event.reply("Playlist not found!").setEphemeral(true).queue();
@@ -330,17 +330,17 @@ public class AudioCommands extends ListenerAdapter {
 
   private void handleSkip(SlashCommandInteractionEvent event, long guildId) {
     String result = audioController.skip(guildId);
-    event.reply(result).queue();
+    event.reply(result).setEphemeral(true).queue();
   }
 
   private void handleStop(SlashCommandInteractionEvent event, long guildId) {
     String result = audioController.stop(guildId);
-    event.reply(result).queue();
+    event.reply(result).setEphemeral(true).queue();
   }
 
   private void handleQueue(SlashCommandInteractionEvent event, long guildId) {
     String result = audioController.getQueueInfo(guildId);
-    event.reply(result).queue();
+    event.reply(result).setEphemeral(true).queue();
   }
 
   private void handleLeave(SlashCommandInteractionEvent event, long guildId) {
@@ -352,12 +352,12 @@ public class AudioCommands extends ListenerAdapter {
     }
 
     audioManager.closeAudioConnection();
-    event.reply("Left the voice channel").queue();
+    event.reply("Left the voice channel").setEphemeral(true).queue();
   }
 
   private void handlePing(SlashCommandInteractionEvent event) {
     long gatewayPing = event.getJDA().getGatewayPing();
-    event.reply("Pong! Gateway ping: " + gatewayPing + "ms").queue();
+    event.reply("Pong! Gateway ping: " + gatewayPing + "ms").setEphemeral(true).queue();
   }
 
   @Override

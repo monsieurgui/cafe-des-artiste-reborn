@@ -105,6 +105,24 @@ public class LavaplayerPlaybackStrategy extends AudioEventAdapter implements Pla
   }
 
   @Override
+  public dev.cafe.audio.AudioTrack getCurrentTrack(long guildId) {
+    AudioPlayer player = guildPlayers.get(guildId);
+    if (player != null && player.getPlayingTrack() != null) {
+      return new LavaplayerAudioTrack(player.getPlayingTrack());
+    }
+    return null;
+  }
+
+  @Override
+  public long getPosition(long guildId) {
+    AudioPlayer player = guildPlayers.get(guildId);
+    if (player != null && player.getPlayingTrack() != null) {
+      return player.getPlayingTrack().getPosition();
+    }
+    return 0;
+  }
+
+  @Override
   public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
     if (endReason.mayStartNext && audioController != null) {
       // Find which guild this player belongs to

@@ -15,4 +15,8 @@ public interface PlaybackStrategy {
   boolean isPlaying(long guildId);
 
   boolean isPaused(long guildId);
+
+  AudioTrack getCurrentTrack(long guildId);
+
+  long getPosition(long guildId);
 }

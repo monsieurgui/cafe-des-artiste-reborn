@@ -33,6 +33,7 @@ public class Main {
       PlaylistManager playlistManager = component.playlistManager();
       CacheCommands cacheCommands = component.cacheCommands();
       SetupCommands setupCommands = component.setupCommands();
+      PostUpdater postUpdater = component.postUpdater();
 
       JDA jda =
           JDABuilder.createDefault(token)
@@ -45,6 +46,8 @@ public class Main {
       if (component.playbackStrategy() instanceof LavaplayerPlaybackStrategy) {
         ((LavaplayerPlaybackStrategy) component.playbackStrategy()).setJDA(jda);
       }
+      postUpdater.setJda(jda);
+      postUpdater.startNowPlayingUpdater();
 
       jda.awaitReady();
       logger.info("Bot is ready!");

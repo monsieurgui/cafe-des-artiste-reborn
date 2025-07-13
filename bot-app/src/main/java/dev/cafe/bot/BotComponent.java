@@ -11,7 +11,8 @@ import javax.inject.Singleton;
 
 /** Dagger component for dependency injection. */
 @Singleton
-@Component(modules = {BotModule.class, CacheModule.class, CacheBindsModule.class})
+@Component(
+    modules = {BotModule.class, BotBindsModule.class, CacheModule.class, CacheBindsModule.class})
 public interface BotComponent {
   AudioController audioController();
 
@@ -24,4 +25,6 @@ public interface BotComponent {
   GuildSettingsRepository guildSettingsRepository();
 
   SetupCommands setupCommands();
+
+  PostUpdater postUpdater();
 }

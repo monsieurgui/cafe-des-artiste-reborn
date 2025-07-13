@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BotModule.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bot-app</a> &gt; <a href="index.source.html" class="el_package">dev.cafe.bot</a> &gt; <span class="el_source">BotModule.java</span></div><h1>BotModule.java</h1><pre class="source lang-java linenums">package dev.cafe.bot;
+
+import dagger.Module;
+import dagger.Provides;
+import dev.cafe.audio.AudioSearchService;
+import dev.cafe.audio.PlaybackStrategy;
+import dev.cafe.audio.lavalink.LavalinkPlaybackStrategy;
+import dev.cafe.audio.lavalink.LavalinkSearchService;
+import dev.cafe.audio.lavaplayer.LavaplayerPlaybackStrategy;
+import dev.cafe.audio.lavaplayer.LavaplayerSearchService;
+import dev.cafe.cache.MostPlayedService;
+import dev.cafe.cache.TrackCacheService;
+import dev.cafe.cache.dagger.Streaming;
+import dev.cafe.config.ConfigLoader;
+import dev.cafe.core.AudioController;
+import dev.cafe.core.PlaylistManager;
+import dev.cafe.core.QueueChangeListener;
+import dev.cafe.core.VoiceManager;
+import dev.cafe.metrics.MetricsBinder;
+import java.util.Optional;
+import javax.inject.Singleton;
+
+/** Dagger module for dependency injection. */
+@Module
+<span class="nc" id="L25">public class BotModule {</span>
+
+  @Provides
+  @Singleton
+  ConfigLoader provideConfigLoader() {
+<span class="nc" id="L30">    return new ConfigLoader();</span>
+  }
+
+  @Provides
+  @Singleton
+  AudioSearchService provideAudioSearchService(ConfigLoader config) {
+<span class="nc" id="L36">    String backend = config.getAudioBackend();</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">    if (&quot;lavalink&quot;.equals(backend)) {</span>
+<span class="nc" id="L38">      return new LavalinkSearchService(</span>
+<span class="nc" id="L39">          config.getLavalinkHost(), config.getLavalinkPort(), config.getLavalinkPassword());</span>
+    } else {
+<span class="nc" id="L41">      return new LavaplayerSearchService();</span>
+    }
+  }
+
+  @Provides
+  @Singleton
+  @Streaming
+  PlaybackStrategy provideStreamingPlaybackStrategy(
+      ConfigLoader config, AudioSearchService searchService) {
+<span class="nc" id="L50">    String backend = config.getAudioBackend();</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">    if (&quot;lavalink&quot;.equals(backend)) {</span>
+<span class="nc" id="L52">      return new LavalinkPlaybackStrategy(</span>
+<span class="nc" id="L53">          config.getLavalinkHost(), config.getLavalinkPort(), config.getLavalinkPassword());</span>
+    } else {
+<span class="nc" id="L55">      return new LavaplayerPlaybackStrategy((LavaplayerSearchService) searchService);</span>
+    }
+  }
+
+  @Provides
+  @Singleton
+  VoiceManager provideVoiceManager() {
+<span class="nc" id="L62">    return new VoiceManager();</span>
+  }
+
+  @Provides
+  @Singleton
+  MetricsBinder provideMetricsBinder() {
+<span class="nc" id="L68">    return new MetricsBinder();</span>
+  }
+
+  @Provides
+  @Singleton
+  PlaylistManager providePlaylistManager() {
+<span class="nc" id="L74">    return new PlaylistManager();</span>
+  }
+
+  @Provides
+  @Singleton
+  AudioController provideAudioController(
+      AudioSearchService searchService,
+      @Streaming PlaybackStrategy playbackStrategy,
+      MetricsBinder metrics,
+      MostPlayedService mostPlayedService,
+      TrackCacheService trackCacheService,
+      Optional&lt;QueueChangeListener&gt; queueChangeListener) {
+<span class="nc" id="L86">    AudioController controller =</span>
+        new AudioController(
+            searchService,
+            playbackStrategy,
+            metrics,
+            mostPlayedService,
+            trackCacheService,
+            queueChangeListener);
+
+    // Set up circular dependency
+<span class="nc bnc" id="L96" title="All 2 branches missed.">    if (playbackStrategy instanceof LavaplayerPlaybackStrategy) {</span>
+<span class="nc" id="L97">      ((LavaplayerPlaybackStrategy) playbackStrategy).setAudioController(controller);</span>
+    }
+
+<span class="nc" id="L100">    return controller;</span>
+  }
+
+  @Provides
+  @Singleton
+  CacheCommands provideCacheCommands(
+      MostPlayedService mostPlayedService, TrackCacheService trackCacheService) {
+<span class="nc" id="L107">    return new CacheCommands(mostPlayedService, trackCacheService);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

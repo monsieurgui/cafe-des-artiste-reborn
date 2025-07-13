@@ -112,6 +112,18 @@ public class LavalinkPlaybackStrategy implements PlaybackStrategy {
     return false;
   }
 
+  @Override
+  public dev.cafe.audio.AudioTrack getCurrentTrack(long guildId) {
+    // TODO: Implement by querying the Lavalink REST API
+    return null;
+  }
+
+  @Override
+  public long getPosition(long guildId) {
+    // TODO: Implement by querying the Lavalink REST API
+    return 0;
+  }
+
   private void updatePlayer(long guildId, String json) {
     try {
       String sessionId = guildSessions.computeIfAbsent(guildId, k -> "session-" + guildId);

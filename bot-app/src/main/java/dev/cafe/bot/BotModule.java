@@ -14,8 +14,10 @@ import dev.cafe.cache.dagger.Streaming;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
+import dev.cafe.core.QueueChangeListener;
 import dev.cafe.core.VoiceManager;
 import dev.cafe.metrics.MetricsBinder;
+import java.util.Optional;
 import javax.inject.Singleton;
 
 /** Dagger module for dependency injection. */
@@ -76,13 +78,19 @@ public class BotModule {
   @Singleton
   AudioController provideAudioController(
       AudioSearchService searchService,
-      PlaybackStrategy playbackStrategy,
+      @Streaming PlaybackStrategy playbackStrategy,
       MetricsBinder metrics,
       MostPlayedService mostPlayedService,
-      TrackCacheService trackCacheService) {
+      TrackCacheService trackCacheService,
+      Optional<QueueChangeListener> queueChangeListener) {
     AudioController controller =
         new AudioController(
-            searchService, playbackStrategy, metrics, mostPlayedService, trackCacheService);
+            searchService,
+            playbackStrategy,
+            metrics,
+            mostPlayedService,
+            trackCacheService,
+            queueChangeListener);
 
     // Set up circular dependency
     if (playbackStrategy instanceof LavaplayerPlaybackStrategy) {

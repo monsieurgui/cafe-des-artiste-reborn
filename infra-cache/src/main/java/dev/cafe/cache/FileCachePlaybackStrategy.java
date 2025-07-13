@@ -84,4 +84,14 @@ public class FileCachePlaybackStrategy implements PlaybackStrategy {
   public boolean isPaused(long guildId) {
     return streamingStrategy.isPaused(guildId);
   }
+
+  @Override
+  public AudioTrack getCurrentTrack(long guildId) {
+    return streamingStrategy.getCurrentTrack(guildId);
+  }
+
+  @Override
+  public long getPosition(long guildId) {
+    return streamingStrategy.getPosition(guildId);
+  }
 }

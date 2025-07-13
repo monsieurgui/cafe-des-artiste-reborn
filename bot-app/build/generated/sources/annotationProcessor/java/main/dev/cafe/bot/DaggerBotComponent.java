@@ -20,7 +20,9 @@ import dev.cafe.cache.guild.SqliteGuildSettingsRepository_Factory;
 import dev.cafe.config.ConfigLoader;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.PlaylistManager;
+import dev.cafe.core.QueueChangeListener;
 import dev.cafe.metrics.MetricsBinder;
+import java.util.Optional;
 import javax.annotation.processing.Generated;
 import javax.inject.Provider;
 import javax.sql.DataSource;
@@ -46,6 +48,26 @@ public final class DaggerBotComponent {
 
   public static BotComponent create() {
     return new Builder().build();
+  }
+
+  /**
+   * A {@code Provider<Optional<T>>} that uses a delegate {@code Provider<T>}.
+   */
+  private static final class PresentJdkOptionalInstanceProvider<T> implements Provider<Optional<T>> {
+    private final Provider<T> delegate;
+
+    private PresentJdkOptionalInstanceProvider(Provider<T> delegate) {
+      this.delegate = Preconditions.checkNotNull(delegate);
+    }
+
+    @Override
+    public Optional<T> get() {
+      return Optional.of(delegate.get());
+    }
+
+    private static <T> Provider<Optional<T>> of(Provider<T> delegate) {
+      return new PresentJdkOptionalInstanceProvider<T>(delegate);
+    }
   }
 
   public static final class Builder {
@@ -86,25 +108,29 @@ public final class DaggerBotComponent {
 
     private Provider<PlaybackStrategy> provideStreamingPlaybackStrategyProvider;
 
+    private Provider<MetricsBinder> provideMetricsBinderProvider;
+
     private Provider<MostPlayedService> provideMostPlayedServiceProvider;
 
     private Provider<TrackCacheService> provideTrackCacheServiceProvider;
-
-    private Provider<FileCachePlaybackStrategy> fileCachePlaybackStrategyProvider;
-
-    private Provider<MetricsBinder> provideMetricsBinderProvider;
-
-    private Provider<AudioController> provideAudioControllerProvider;
-
-    private Provider<PlaylistManager> providePlaylistManagerProvider;
-
-    private Provider<CacheCommands> provideCacheCommandsProvider;
 
     private Provider<String> provideDatabaseUrlProvider;
 
     private Provider<DataSource> provideDataSourceProvider;
 
     private Provider<SqliteGuildSettingsRepository> sqliteGuildSettingsRepositoryProvider;
+
+    private Provider<PostUpdater> postUpdaterProvider;
+
+    private Provider<Optional<QueueChangeListener>> optionalOfQueueChangeListenerProvider;
+
+    private Provider<AudioController> provideAudioControllerProvider;
+
+    private Provider<FileCachePlaybackStrategy> fileCachePlaybackStrategyProvider;
+
+    private Provider<PlaylistManager> providePlaylistManagerProvider;
+
+    private Provider<CacheCommands> provideCacheCommandsProvider;
 
     private Provider<SetupCommands> setupCommandsProvider;
 
@@ -119,16 +145,18 @@ public final class DaggerBotComponent {
       this.provideConfigLoaderProvider = DoubleCheck.provider(BotModule_ProvideConfigLoaderFactory.create(botModuleParam));
       this.provideAudioSearchServiceProvider = DoubleCheck.provider(BotModule_ProvideAudioSearchServiceFactory.create(botModuleParam, provideConfigLoaderProvider));
       this.provideStreamingPlaybackStrategyProvider = DoubleCheck.provider(BotModule_ProvideStreamingPlaybackStrategyFactory.create(botModuleParam, provideConfigLoaderProvider, provideAudioSearchServiceProvider));
+      this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
       this.provideMostPlayedServiceProvider = DoubleCheck.provider(CacheModule_ProvideMostPlayedServiceFactory.create(cacheModuleParam));
       this.provideTrackCacheServiceProvider = DoubleCheck.provider(CacheModule_ProvideTrackCacheServiceFactory.create(cacheModuleParam));
-      this.fileCachePlaybackStrategyProvider = DoubleCheck.provider(FileCachePlaybackStrategy_Factory.create(provideStreamingPlaybackStrategyProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
-      this.provideMetricsBinderProvider = DoubleCheck.provider(BotModule_ProvideMetricsBinderFactory.create(botModuleParam));
-      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, ((Provider) fileCachePlaybackStrategyProvider), provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
-      this.providePlaylistManagerProvider = DoubleCheck.provider(BotModule_ProvidePlaylistManagerFactory.create(botModuleParam));
-      this.provideCacheCommandsProvider = DoubleCheck.provider(BotModule_ProvideCacheCommandsFactory.create(botModuleParam, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
       this.provideDatabaseUrlProvider = DoubleCheck.provider(CacheModule_ProvideDatabaseUrlFactory.create(cacheModuleParam, provideConfigLoaderProvider));
       this.provideDataSourceProvider = DoubleCheck.provider(CacheModule_ProvideDataSourceFactory.create(cacheModuleParam, provideDatabaseUrlProvider));
       this.sqliteGuildSettingsRepositoryProvider = DoubleCheck.provider(SqliteGuildSettingsRepository_Factory.create(provideDataSourceProvider));
+      this.postUpdaterProvider = DoubleCheck.provider(PostUpdater_Factory.create(((Provider) sqliteGuildSettingsRepositoryProvider), provideStreamingPlaybackStrategyProvider));
+      this.optionalOfQueueChangeListenerProvider = PresentJdkOptionalInstanceProvider.of(((Provider) postUpdaterProvider));
+      this.provideAudioControllerProvider = DoubleCheck.provider(BotModule_ProvideAudioControllerFactory.create(botModuleParam, provideAudioSearchServiceProvider, provideStreamingPlaybackStrategyProvider, provideMetricsBinderProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider, optionalOfQueueChangeListenerProvider));
+      this.fileCachePlaybackStrategyProvider = DoubleCheck.provider(FileCachePlaybackStrategy_Factory.create(provideStreamingPlaybackStrategyProvider, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
+      this.providePlaylistManagerProvider = DoubleCheck.provider(BotModule_ProvidePlaylistManagerFactory.create(botModuleParam));
+      this.provideCacheCommandsProvider = DoubleCheck.provider(BotModule_ProvideCacheCommandsFactory.create(botModuleParam, provideMostPlayedServiceProvider, provideTrackCacheServiceProvider));
       this.setupCommandsProvider = DoubleCheck.provider(SetupCommands_Factory.create(((Provider) sqliteGuildSettingsRepositoryProvider)));
     }
 
@@ -160,6 +188,11 @@ public final class DaggerBotComponent {
     @Override
     public SetupCommands setupCommands() {
       return setupCommandsProvider.get();
+    }
+
+    @Override
+    public PostUpdater postUpdater() {
+      return postUpdaterProvider.get();
     }
   }
 }
