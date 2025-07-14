@@ -7,7 +7,6 @@ import java.util.List;
 import javax.inject.Inject;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -27,19 +26,6 @@ public class CacheCommands extends ListenerAdapter {
     this.trackCacheService = trackCacheService;
   }
 
-  @Override
-  public void onReady(ReadyEvent event) {
-    event
-        .getJDA()
-        .updateCommands()
-        .addCommands(
-            Commands.slash("cache", "Manage the cache")
-                .addSubcommands(
-                    new SubcommandData("stats", "Show cache statistics"),
-                    new SubcommandData("clear", "Clear the entire cache")))
-        .queue();
-    logger.info("Cache commands registered");
-  }
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {

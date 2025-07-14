@@ -8,6 +8,7 @@ services:
     restart: unless-stopped
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - DATABASE_PATH=cafe-bot.db
       - JAVA_TOOL_OPTIONS=${BOT_JAVA_OPTS:-XX:+UseZGC -XX:MaxRAMPercentage=75.0}
     ports:
       - "${BOT_PORT:-8080}:8080"

@@ -7,7 +7,13 @@
       "Bash(docker-compose:*)",
       "Bash(curl:*)",
       "Bash(jar tf:*)",
-      "Bash(docker run:*)"
+      "Bash(docker run:*)",
+      "Bash(docker image rm:*)",
+      "Bash(.gradlew.bat:*)",
+      "Bash(timeout 10 docker-compose up --abort-on-container-exit)",
+      "Bash(timeout 15 docker-compose logs cafe-bot --follow)",
+      "Bash(timeout 30 docker-compose up --build)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

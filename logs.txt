@@ -1,0 +1,11 @@
+bot-a-gui-dev
+APP
+ — 8:56 PM
+Please link a text channel for me to post the queue and now-playing messages in. Just mention the channel, like #music.
+Monsieur Gui — 8:56 PM
+#test-bot-playground
+bot-a-gui-dev
+APP
+ — 8:56 PM
+That doesn't look like a channel mention. Please mention a text channel from the server, for example: #music.
+Your setup session has timed out.

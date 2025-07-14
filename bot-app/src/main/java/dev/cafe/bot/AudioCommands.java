@@ -2,6 +2,7 @@ package dev.cafe.bot;
 
 import dev.cafe.audio.AudioTrack;
 import dev.cafe.audio.SearchResult;
+import dev.cafe.cache.guild.GuildSettingsRepository;
 import dev.cafe.core.AudioController;
 import dev.cafe.core.Playlist;
 import dev.cafe.core.PlaylistManager;
@@ -15,7 +16,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -32,41 +32,15 @@ public class AudioCommands extends ListenerAdapter {
 
   private final AudioController audioController;
   private final PlaylistManager playlistManager;
+  private final GuildSettingsRepository guildSettingsRepository;
   private final ConcurrentMap<String, List<AudioTrack>> searchCache = new ConcurrentHashMap<>();
 
-  public AudioCommands(AudioController audioController, PlaylistManager playlistManager) {
+  public AudioCommands(AudioController audioController, PlaylistManager playlistManager, GuildSettingsRepository guildSettingsRepository) {
     this.audioController = audioController;
     this.playlistManager = playlistManager;
+    this.guildSettingsRepository = guildSettingsRepository;
   }
 
-  @Override
-  public void onReady(ReadyEvent event) {
-    event
-        .getJDA()
-        .updateCommands()
-        .addCommands(
-            Commands.slash("leave", "Leave the voice channel"),
-            Commands.slash("play", "Play audio")
-                .addSubcommands(
-                    new SubcommandData("url", "Play a single song from a URL")
-                        .addOption(OptionType.STRING, "url", "The URL of the song", true),
-                    new SubcommandData("playlist", "Play a playlist from a URL")
-                        .addOption(OptionType.STRING, "url", "The URL of the playlist", true),
-                    new SubcommandData("search", "Search for a song and pick from the results")
-                        .addOption(OptionType.STRING, "query", "The search query", true)),
-            Commands.slash("p", "Play a song, playlist, or search for a song")
-                .addOption(OptionType.STRING, "query", "URL or search term", true, false),
-            Commands.slash("playlist", "Manage playlists")
-                .addOption(OptionType.STRING, "action", "Action to perform", true)
-                .addOption(OptionType.STRING, "name", "Playlist name", false)
-                .addOption(OptionType.STRING, "id", "Playlist ID", false),
-            Commands.slash("skip", "Skip the current song"),
-            Commands.slash("stop", "Stop playback and clear queue"),
-            Commands.slash("queue", "Show the current queue"),
-            Commands.slash("ping", "Check if the bot is responsive"))
-        .queue();
-    logger.info("Audio commands registered");
-  }
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
@@ -106,6 +80,11 @@ public class AudioCommands extends ListenerAdapter {
   }
 
   private void handleP(SlashCommandInteractionEvent event, long guildId) {
+    // Check if guild is set up
+    if (!checkSetupStatus(event, guildId)) {
+      return;
+    }
+
     String query = event.getOption("query").getAsString();
 
     // Simple URL check. This can be improved, but for now, it's a good heuristic.
@@ -149,6 +128,11 @@ public class AudioCommands extends ListenerAdapter {
   }
 
   private void handlePlay(SlashCommandInteractionEvent event, long guildId) {
+    // Check if guild is set up
+    if (!checkSetupStatus(event, guildId)) {
+      return;
+    }
+
     String subcommand = event.getSubcommandName();
     if (subcommand == null) {
       event.reply("Invalid command structure.").setEphemeral(true).queue();
@@ -599,6 +583,26 @@ public class AudioCommands extends ListenerAdapter {
         "Auto-joined voice channel: {} in guild: {}",
         voiceChannel.getName(),
         event.getGuild().getName());
+    return true;
+  }
+
+  /**
+   * Checks if the guild has been set up and reminds the user if not.
+   *
+   * @param event The slash command event
+   * @param guildId The guild ID
+   * @return true if setup is complete, false if setup is needed
+   */
+  private boolean checkSetupStatus(SlashCommandInteractionEvent event, long guildId) {
+    if (guildSettingsRepository.findById(guildId).isEmpty()) {
+      event.reply("⚠️ **Setup Required!**\n\n" +
+                  "The bot hasn't been set up in this server yet. " +
+                  "Please ask an administrator to run `/setup` to configure the bot.\n\n" +
+                  "This will set up pinned messages for queue and now-playing status.")
+          .setEphemeral(true)
+          .queue();
+      return false;
+    }
     return true;
   }
 }
