@@ -1,66 +1,40 @@
 version: '3.8'
 
 services:
-  # Bot services will be added here as development progresses
-  # This file serves as the foundation for the containerized architecture
-  
-  # Placeholder for bot-app service
-  # bot-app:
-  #   build:
-  #     context: .
-  #     dockerfile: infra-config/Dockerfile.bot-app
-  #   depends_on:
-  #     - rabbitmq
-  #     - database
-  
-  # Placeholder for bot-core service  
-  # bot-core:
-  #   build:
-  #     context: .
-  #     dockerfile: infra-config/Dockerfile.bot-core
-  #   depends_on:
-  #     - rabbitmq
-  #     - database
-  
-  # Placeholder for bot-player service
-  # bot-player:
-  #   build:
-  #     context: .
-  #     dockerfile: infra-config/Dockerfile.bot-player
-  #   depends_on:
-  #     - rabbitmq
-  #     - database
-  
-  # Infrastructure services
+  bot-app:
+    build:
+      context: .
+      dockerfile: infra-config/Dockerfile.bot-app
+    depends_on:
+      - rabbitmq
+      - database
+    environment:
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - DATABASE_URL=jdbc:h2:tcp://database:9092/./data/bot
+
+  bot-core:
+    build:
+      context: .
+      dockerfile: infra-config/Dockerfile.bot-core
+    depends_on:
+      - rabbitmq
+      - database
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - DATABASE_URL=jdbc:h2:tcp://database:9092/./data/bot
+
+  bot-player:
+    build:
+      context: .
+      dockerfile: infra-config/Dockerfile.bot-player
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+
   rabbitmq:
     image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: password
-    healthcheck:
-      test: ["CMD", "rabbitmqctl", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   database:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: musicbot
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d musicbot"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-volumes:
-  postgres_data:
+    image: oscarfonts/h2:latest

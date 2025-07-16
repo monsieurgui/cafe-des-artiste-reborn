@@ -1,25 +1,14 @@
-FROM python:3.11-slim
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+COPY bot-core/target/bot-core-1.0.0-SNAPSHOT.jar app.jar
 
-# Copy requirements and install Python dependencies
-COPY bot-core/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+EXPOSE 8081
 
-# Copy bot-common (shared library)
-COPY bot-common/ ./bot-common/
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8081/health || exit 1
 
-# Copy bot-core source code
-COPY bot-core/ ./bot-core/
+ENV JAVA_OPTS=""
 
-# Set Python path to include bot-common
-ENV PYTHONPATH=/app
-
-WORKDIR /app/bot-core
-
-CMD ["python", "main.py"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

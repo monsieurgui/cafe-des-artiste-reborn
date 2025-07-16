@@ -1,20 +1,14 @@
-FROM python:3.11-slim
+FROM openjdk:17-jre-slim
 
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
-COPY bot-app/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY bot-app/target/bot-app-1.0.0-SNAPSHOT.jar app.jar
 
-# Copy bot-common (shared library)
-COPY bot-common/ ./bot-common/
+EXPOSE 8080
 
-# Copy bot-app source code
-COPY bot-app/ ./bot-app/
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
 
-# Set Python path to include bot-common
-ENV PYTHONPATH=/app
+ENV JAVA_OPTS=""
 
-WORKDIR /app/bot-app
-
-CMD ["python", "main.py"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
