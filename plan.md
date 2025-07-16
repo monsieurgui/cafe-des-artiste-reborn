@@ -95,13 +95,4 @@ User Story 4: As a new user, I want the bot to guide me through the setup proces
     Task 4.4: Implement a mechanism to listen for the owner's response in the DM. - b1d0e83
     Task 4.5: Upon receiving a valid channel mention, store the guild_id and the designated channel_id in the database. - b1d0e83
 
-User Story 5: As a server administrator, I want the bot to prompt for setup if it's already in the server but hasn't been configured. - 8a29116
-    Task 5.1: In bot-app/, on bot startup, iterate through all guilds the bot is a member of. - 8a29116
-    Task 5.2: For each guild, check the database to see if a text channel has been configured. - 8a29116
-    Task 5.3: If a guild is not configured, trigger the same DM setup flow as in User Story 4. - 8a29116
 
-User Story 6: As a user, I want to see dedicated embeds for the queue and the currently playing song in the configured channel. - 8a29116
-    Task 6.1: Once the text channel is configured, the bot should post two initial embed messages to that channel. - 8a29116
-    Task 6.2: The top embed will be for the queue. It should initially show "The queue is empty." - 8a29116
-    Task 6.3: The bottom embed will be for the "Now Playing" status. It should initially show "Nothing is currently playing." - 8a29116
-    Task 6.4: Store the message IDs of these two embeds in the database, linked to the guild_id, for future updates. - 8a29116
