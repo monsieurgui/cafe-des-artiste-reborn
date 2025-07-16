@@ -1,0 +1,28 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies for audio processing
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libopus0 \
+    libffi-dev \
+    libnacl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install Python dependencies
+COPY bot-player/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy bot-common (shared library)
+COPY bot-common/ ./bot-common/
+
+# Copy bot-player source code
+COPY bot-player/ ./bot-player/
+
+# Set Python path to include bot-common
+ENV PYTHONPATH=/app
+
+WORKDIR /app/bot-player
+
+CMD ["python", "main.py"]

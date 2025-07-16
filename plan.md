@@ -1,15 +1,5 @@
 Project Structure & Setup (Epic: Foundation)
 This epic covers the initial setup of the project structure and the core components required for the bot to function.
-User Story 2: As a developer, I want to define the common interfaces so that all microservices can communicate consistently.
-    Task 2.1: In bot-common/, define a Song data class with attributes: title, url, thumbnail_url, duration, requester_id, and guild_id.
-    Task 2.2: In bot-common/, define a Queue interface with methods like add_song, get_next_song, remove_song, get_queue, and clear_queue.
-    Task 2.3: In bot-common/, define a PlayerStatus enum with states like PLAYING, PAUSED, and STOPPED.
-User Story 3: As a developer, I want to configure the infrastructure so that the services can run in a containerized environment.
-    Task 3.1: In infra-config/, create a Dockerfile for bot-core.
-    Task 3.2: In infra-config/, create a Dockerfile for bot-app.
-    Task 3.3: In infra-config/, create a Dockerfile for bot-player.
-    Task 3.4: In infra-config/, set up a RabbitMQ service in the docker-compose.yml file.
-    Task 3.5: In infra-config/, set up a PostgreSQL or a simple file-based database service (like SQLite) in the docker-compose.yml for persistence.
 
 Bot Initialization & Configuration (Epic: First Run Experience)
 This epic focuses on the bot's first interaction with a guild and the setup of its dedicated channel.
@@ -100,3 +90,15 @@ User Story 1: As a developer, I want to set up the project's directory structure
     Task 1.2: Inside the root, create the following directories: bot-core/, bot-app/, bot-player/, bot-common/, and infra-config/. - 651ce1e
     Task 1.3: Create a docker-compose.yml file in the root directory. - 651ce1e
     Task 1.4: Create a README.md file with a brief description of the project and each module. - 651ce1e
+
+User Story 2: As a developer, I want to define the common interfaces so that all microservices can communicate consistently.
+    Task 2.1: In bot-common/, define a Song data class with attributes: title, url, thumbnail_url, duration, requester_id, and guild_id.
+    Task 2.2: In bot-common/, define a Queue interface with methods like add_song, get_next_song, remove_song, get_queue, and clear_queue.
+    Task 2.3: In bot-common/, define a PlayerStatus enum with states like PLAYING, PAUSED, and STOPPED.
+
+User Story 3: As a developer, I want to configure the infrastructure so that the services can run in a containerized environment.
+    Task 3.1: In infra-config/, create a Dockerfile for bot-core.
+    Task 3.2: In infra-config/, create a Dockerfile for bot-app.
+    Task 3.3: In infra-config/, create a Dockerfile for bot-player.
+    Task 3.4: In infra-config/, set up a RabbitMQ service in the docker-compose.yml file.
+    Task 3.5: In infra-config/, set up a PostgreSQL or a simple file-based database service (like SQLite) in the docker-compose.yml for persistence.
