@@ -21,3 +21,8 @@
 - All common models placed in bot-common module for shared access
 - Used builder pattern for Song construction to improve readability
 - Followed Javadoc documentation standards for all public APIs
+
+## Infrastructure Configuration (User Story 3)
+- Docker Compose already configured with all required services during initial setup
+- RabbitMQ service configured for inter-service messaging
+- H2 database service configured for data persistence

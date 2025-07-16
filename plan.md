@@ -1,10 +1,5 @@
 Project Structure & Setup (Epic: Foundation)
 This epic covers the initial setup of the Java project structure, build configurations, and core components.
-User Story 3: As a developer, I want to configure the infrastructure so that the services can run in a containerized environment.
-Task 3.1: Configure the docker-compose.yml to build and run each Java microservice.
-Task 3.2: Add a RabbitMQ service to the docker-compose.yml.
-Task 3.3: Add a PostgreSQL or H2 (for simplicity) database service to docker-compose.yml for persistence.
-Task 3.4: Configure environment variables in docker-compose.yml for the bot token, database credentials, and RabbitMQ connection details.
 
 Bot Initialization & Configuration (Epic: First Run Experience)
 This epic focuses on the bot's first interaction with a guild and setting up its dedicated channel.
@@ -79,6 +74,11 @@ Task 15.3: In bot-player, the handler will perform the same actions as leave.
 Task 15.4: In bot-core, a listener for the reset event will also clear the embeds, resetting them to their initial "empty" state.
 
 ## DONE =====
+User Story 3: As a developer, I want to configure the infrastructure so that the services can run in a containerized environment. (17cb2be)
+Task 3.1: Configure the docker-compose.yml to build and run each Java microservice.
+Task 3.2: Add a RabbitMQ service to the docker-compose.yml.
+Task 3.3: Add a PostgreSQL or H2 (for simplicity) database service to docker-compose.yml for persistence.
+Task 3.4: Configure environment variables in docker-compose.yml for the bot token, database credentials, and RabbitMQ connection details.
 User Story 2: As a developer, I want to define the common interfaces and data models so that all microservices can communicate consistently. (b8cf9bb)
 Task 2.1: In the bot-common module, define a Song POJO (Plain Old Java Object) with attributes: title, url, thumbnailUrl, duration, requesterId, and guildId.
 Task 2.2: In bot-common, define a QueueManager interface with methods like addSong(Song song), getNextSong(), removeSong(int index), getQueue(), and clearQueue().
