@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn:*)",
+      "Bash(where mvn)",
+      "Bash(curl:*)",
+      "Bash(docker:*)",
+      "Bash(java:*)",
+      "Bash(where java)"
+    ],
+    "deny": []
+  }
+}
