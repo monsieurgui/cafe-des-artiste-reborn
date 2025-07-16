@@ -89,3 +89,9 @@ Task 15.3: In bot-player, the handler will perform the same actions as leave.
 Task 15.4: In bot-core, a listener for the reset event will also clear the embeds, resetting them to their initial "empty" state.
 
 ## DONE =====
+User Story 1: As a developer, I want to set up a multi-module Maven/Gradle project so that the codebase is modular and organized. (b4d22e2)
+Task 1.1: Create a root pom.xml (Maven) or settings.gradle (Gradle) file to define the project modules.
+Task 1.2: Create the following modules: bot-core, bot-app, bot-player, bot-common, and infra-config.
+Task 1.3: In the root, create a docker-compose.yml file.
+Task 1.4: In infra-config, create Dockerfile templates for each Java-based microservice.
+Task 1.5: Configure the build file in each module to include necessary dependencies (e.g., JDA in bot-app and bot-core, LavaPlayer in bot-player).
