@@ -3,12 +3,6 @@ This epic covers the initial setup of the project structure and the core compone
 
 Bot Initialization & Configuration (Epic: First Run Experience)
 This epic focuses on the bot's first interaction with a guild and the setup of its dedicated channel.
-User Story 4: As a new user, I want the bot to guide me through the setup process when it joins my server so that I can easily configure its dedicated channel.
-    Task 4.1: In bot-app/, implement an on_guild_join event handler.
-    Task 4.2: In the on_guild_join event, send a direct message to the guild owner.
-    Task 4.3: The DM should request the owner to specify a text channel for the bot's use (e.g., by mentioning the channel).
-    Task 4.4: Implement a mechanism to listen for the owner's response in the DM.
-    Task 4.5: Upon receiving a valid channel mention, store the guild_id and the designated channel_id in the database.
 User Story 5: As a server administrator, I want the bot to prompt for setup if it's already in the server but hasn't been configured.
     Task 5.1: In bot-app/, on bot startup, iterate through all guilds the bot is a member of.
     Task 5.2: For each guild, check the database to see if a text channel has been configured.
@@ -102,3 +96,10 @@ User Story 3: As a developer, I want to configure the infrastructure so that the
     Task 3.3: In infra-config/, create a Dockerfile for bot-player.
     Task 3.4: In infra-config/, set up a RabbitMQ service in the docker-compose.yml file.
     Task 3.5: In infra-config/, set up a PostgreSQL or a simple file-based database service (like SQLite) in the docker-compose.yml for persistence.
+
+User Story 4: As a new user, I want the bot to guide me through the setup process when it joins my server so that I can easily configure its dedicated channel. - b1d0e83
+    Task 4.1: In bot-app/, implement an on_guild_join event handler. - b1d0e83
+    Task 4.2: In the on_guild_join event, send a direct message to the guild owner. - b1d0e83
+    Task 4.3: The DM should request the owner to specify a text channel for the bot's use (e.g., by mentioning the channel). - b1d0e83
+    Task 4.4: Implement a mechanism to listen for the owner's response in the DM. - b1d0e83
+    Task 4.5: Upon receiving a valid channel mention, store the guild_id and the designated channel_id in the database. - b1d0e83
