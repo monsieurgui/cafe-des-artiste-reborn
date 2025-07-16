@@ -1,10 +1,5 @@
 Project Structure & Setup (Epic: Foundation)
 This epic covers the initial setup of the project structure and the core components required for the bot to function.
-User Story 1: As a developer, I want to set up the project's directory structure so that the codebase is modular and organized.
-    Task 1.1: Create the root directory for the project.
-    Task 1.2: Inside the root, create the following directories: bot-core/, bot-app/, bot-player/, bot-common/, and infra-config/.
-    Task 1.3: Create a docker-compose.yml file in the root directory.
-    Task 1.4: Create a README.md file with a brief description of the project and each module.
 User Story 2: As a developer, I want to define the common interfaces so that all microservices can communicate consistently.
     Task 2.1: In bot-common/, define a Song data class with attributes: title, url, thumbnail_url, duration, requester_id, and guild_id.
     Task 2.2: In bot-common/, define a Queue interface with methods like add_song, get_next_song, remove_song, get_queue, and clear_queue.
@@ -98,3 +93,10 @@ User Story 16: As a user, I want to be able to completely reset the bot's state 
     Task 16.2: Publish a message to the player_control queue with the command reset and the guild_id.
     Task 16.3: In bot-player/, upon receiving the reset command, disconnect from the voice channel and clear the queue.
     Task 16.4: In bot-core/, in response to the reset command, clear the queue embed and reset the "Now Playing" embed to their initial states.
+
+## Done
+User Story 1: As a developer, I want to set up the project's directory structure so that the codebase is modular and organized. - 651ce1e
+    Task 1.1: Create the root directory for the project. - 651ce1e
+    Task 1.2: Inside the root, create the following directories: bot-core/, bot-app/, bot-player/, bot-common/, and infra-config/. - 651ce1e
+    Task 1.3: Create a docker-compose.yml file in the root directory. - 651ce1e
+    Task 1.4: Create a README.md file with a brief description of the project and each module. - 651ce1e
