@@ -8,8 +8,15 @@ services:
       - database
     environment:
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - DATABASE_URL=jdbc:h2:tcp://database:9092/./data/bot
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - JAVA_OPTS=${JAVA_OPTS}
+      - LOG_LEVEL=${LOG_LEVEL}
+    restart: unless-stopped
+    networks:
+      - bot-network
 
   bot-core:
     build:
@@ -19,8 +26,15 @@ services:
       - rabbitmq
       - database
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
-      - DATABASE_URL=jdbc:h2:tcp://database:9092/./data/bot
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - JAVA_OPTS=${JAVA_OPTS}
+      - LOG_LEVEL=${LOG_LEVEL}
+    restart: unless-stopped
+    networks:
+      - bot-network
 
   bot-player:
     build:
@@ -29,10 +43,43 @@ services:
     depends_on:
       - rabbitmq
     environment:
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_URL=${RABBITMQ_URL}
+      - JAVA_OPTS=${JAVA_OPTS}
+      - LOG_LEVEL=${LOG_LEVEL}
+    restart: unless-stopped
+    networks:
+      - bot-network
 
   rabbitmq:
     image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+    networks:
+      - bot-network
 
   database:
     image: oscarfonts/h2:latest
+    environment:
+      - H2_OPTIONS=${H2_OPTIONS} -ifNotExists
+    ports:
+      - "9092:9092"  # H2 TCP port
+      - "8082:8082"  # H2 Web console
+    volumes:
+      - h2_data:/h2-data
+    restart: unless-stopped
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  rabbitmq_data:
+  h2_data:

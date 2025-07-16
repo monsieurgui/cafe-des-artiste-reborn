@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS guilds (
+    id VARCHAR(255) PRIMARY KEY,
+    prefix VARCHAR(255)
+);
