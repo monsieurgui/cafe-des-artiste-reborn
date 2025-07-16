@@ -13,3 +13,11 @@
 - Standard Maven directory structure (src/main/java, src/test/java) for all modules
 - Docker Compose configuration with separate services for each bot module
 - H2 database chosen over PostgreSQL for initial simplicity
+
+## Common Data Models (User Story 2)
+- Song POJO: Immutable data class with title, url, thumbnailUrl, duration, requesterId, guildId
+- QueueManager interface: Defines contract for queue operations across services
+- PlayerStatus enum: PLAYING, PAUSED, STOPPED states for player status communication
+- All common models placed in bot-common module for shared access
+- Used builder pattern for Song construction to improve readability
+- Followed Javadoc documentation standards for all public APIs

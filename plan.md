@@ -1,15 +1,5 @@
 Project Structure & Setup (Epic: Foundation)
 This epic covers the initial setup of the Java project structure, build configurations, and core components.
-User Story 1: As a developer, I want to set up a multi-module Maven/Gradle project so that the codebase is modular and organized.
-Task 1.1: Create a root pom.xml (Maven) or settings.gradle (Gradle) file to define the project modules.
-Task 1.2: Create the following modules: bot-core, bot-app, bot-player, bot-common, and infra-config.
-Task 1.3: In the root, create a docker-compose.yml file.
-Task 1.4: In infra-config, create Dockerfile templates for each Java-based microservice.
-Task 1.5: Configure the build file in each module to include necessary dependencies (e.g., JDA in bot-app and bot-core, LavaPlayer in bot-player).
-User Story 2: As a developer, I want to define the common interfaces and data models so that all microservices can communicate consistently.
-Task 2.1: In the bot-common module, define a Song POJO (Plain Old Java Object) with attributes: title, url, thumbnailUrl, duration, requesterId, and guildId.
-Task 2.2: In bot-common, define a QueueManager interface with methods like addSong(Song song), getNextSong(), removeSong(int index), getQueue(), and clearQueue().
-Task 2.3: In bot-common, define a PlayerStatus enum with states: PLAYING, PAUSED, and STOPPED.
 User Story 3: As a developer, I want to configure the infrastructure so that the services can run in a containerized environment.
 Task 3.1: Configure the docker-compose.yml to build and run each Java microservice.
 Task 3.2: Add a RabbitMQ service to the docker-compose.yml.
@@ -89,6 +79,10 @@ Task 15.3: In bot-player, the handler will perform the same actions as leave.
 Task 15.4: In bot-core, a listener for the reset event will also clear the embeds, resetting them to their initial "empty" state.
 
 ## DONE =====
+User Story 2: As a developer, I want to define the common interfaces and data models so that all microservices can communicate consistently. (b8cf9bb)
+Task 2.1: In the bot-common module, define a Song POJO (Plain Old Java Object) with attributes: title, url, thumbnailUrl, duration, requesterId, and guildId.
+Task 2.2: In bot-common, define a QueueManager interface with methods like addSong(Song song), getNextSong(), removeSong(int index), getQueue(), and clearQueue().
+Task 2.3: In bot-common, define a PlayerStatus enum with states: PLAYING, PAUSED, and STOPPED.
 User Story 1: As a developer, I want to set up a multi-module Maven/Gradle project so that the codebase is modular and organized. (b4d22e2)
 Task 1.1: Create a root pom.xml (Maven) or settings.gradle (Gradle) file to define the project modules.
 Task 1.2: Create the following modules: bot-core, bot-app, bot-player, bot-common, and infra-config.
